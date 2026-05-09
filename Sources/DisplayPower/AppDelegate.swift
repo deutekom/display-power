@@ -7,9 +7,21 @@ private let kLaunchAgentLabel   = "com.user.displaypower"
 
 // Kandidaten – zur Laufzeit auf Verfügbarkeit geprüft
 private let kIconStyleCandidates: [(symbol: String, label: String)] = [
-    ("display",           "Monitor"),
-    ("hdmi",              "HDMI"),
-    ("cable.connector",   "Kabel-Stecker"),
+    // Monitor / Display
+    ("display",                              "Monitor"),
+    ("display.2",                            "Zwei Monitore"),
+    ("desktopcomputer",                      "Desktop-Computer"),
+    ("tv",                                   "Fernseher"),
+    ("tv.fill",                              "Fernseher (gefüllt)"),
+    ("tv.inset.filled",                      "Fernseher (inset)"),
+    ("rectangle.inset.filled",               "Bildschirmfläche"),
+    // Kabel / Anschluss / HDMI
+    ("hdmi",                                 "HDMI"),
+    ("cable.connector",                      "Kabel-Stecker"),
+    ("cable.connector.horizontal",           "Kabel-Stecker (horizontal)"),
+    ("cable.coaxial",                        "Koaxialkabel"),
+    ("powerplug",                            "Stecker"),
+    ("powerplug.fill",                       "Stecker (gefüllt)"),
 ]
 
 @MainActor
