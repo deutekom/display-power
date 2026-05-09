@@ -24,6 +24,9 @@ final class SettingsViewController: NSViewController {
         rebuildView()
     }
 
+    /// Baut die gesamte View-Hierarchie neu auf.
+    /// Erstellt: Titel, Radio-Buttons für jeden Monitor, Trennlinie, Beenden-Button.
+    /// Wird bei viewDidLoad und vor jedem Popover-Öffnen aufgerufen.
     private func rebuildView() {
         view.subviews.forEach { $0.removeFromSuperview() }
 
@@ -76,12 +79,9 @@ final class SettingsViewController: NSViewController {
     }
 
     @objc private func radioTapped(_ sender: NSButton) {
-        // Alle Radio-Buttons der Stack-View aktualisieren
         if let stack = sender.superview as? NSStackView {
-            for case let btn as NSButton in stack.arrangedSubviews {
-                if btn.cell?.isKind(of: NSButtonCell.self) == true {
-                    btn.state = btn.tag == sender.tag ? .on : .off
-                }
+            for case let btn as NSButton in stack.arrangedSubviews where btn.tag != 0 {
+                btn.state = btn.tag == sender.tag ? .on : .off
             }
         }
         selectedID = CGDirectDisplayID(sender.tag)

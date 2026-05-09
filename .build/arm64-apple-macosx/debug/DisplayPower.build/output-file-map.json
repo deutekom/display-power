@@ -9,6 +9,13 @@
     "swift-dependencies": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swiftdeps",
     "diagnostics": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.dia"
   },
+  "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/SettingsViewController.swift": {
+    "dependencies": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.d",
+    "object": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.swift.o",
+    "swiftmodule": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController~partial.swiftmodule",
+    "swift-dependencies": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.swiftdeps",
+    "diagnostics": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.dia"
+  },
   "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift": {
     "dependencies": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.d",
     "object": "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.swift.o",
