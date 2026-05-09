@@ -5,23 +5,24 @@ private let kSelectedDisplayKey = "selectedDisplayID"
 private let kIconStyleKey       = "iconStyle"
 private let kLaunchAgentLabel   = "com.user.displaypower"
 
-// Kandidaten – zur Laufzeit auf Verfügbarkeit geprüft
-private let kIconStyleCandidates: [(symbol: String, label: String)] = [
+// Kandidaten – zur Laufzeit auf Verfügbarkeit geprüft.
+// Labels werden erst beim Menü-Aufbau lokalisiert (L() erfordert Bundle.module).
+private let kIconStyleCandidates: [(symbol: String, labelKey: String)] = [
     // Monitor / Display
-    ("display",                              "Monitor"),
-    ("display.2",                            "Zwei Monitore"),
-    ("desktopcomputer",                      "Desktop-Computer"),
-    ("tv",                                   "Fernseher"),
-    ("tv.fill",                              "Fernseher (gefüllt)"),
-    ("tv.inset.filled",                      "Fernseher (inset)"),
-    ("rectangle.inset.filled",               "Bildschirmfläche"),
+    ("display",                              "icon_monitor"),
+    ("display.2",                            "icon_two_monitors"),
+    ("desktopcomputer",                      "icon_desktop_computer"),
+    ("tv",                                   "icon_tv"),
+    ("tv.fill",                              "icon_tv_filled"),
+    ("tv.inset.filled",                      "icon_tv_inset"),
+    ("rectangle.inset.filled",               "icon_screen_area"),
     // Kabel / Anschluss / HDMI
-    ("hdmi",                                 "HDMI"),
-    ("cable.connector",                      "Kabel-Stecker"),
-    ("cable.connector.horizontal",           "Kabel-Stecker (horizontal)"),
-    ("cable.coaxial",                        "Koaxialkabel"),
-    ("powerplug",                            "Stecker"),
-    ("powerplug.fill",                       "Stecker (gefüllt)"),
+    ("hdmi",                                 "icon_hdmi"),
+    ("cable.connector",                      "icon_cable_connector"),
+    ("cable.connector.horizontal",           "icon_cable_connector_h"),
+    ("cable.coaxial",                        "icon_coaxial"),
+    ("powerplug",                            "icon_plug"),
+    ("powerplug.fill",                       "icon_plug_filled"),
 ]
 
 @MainActor
@@ -33,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
 
     // Nur Symbole die auf diesem System tatsächlich existieren
-    private lazy var availableIconStyles: [(symbol: String, label: String)] = {
+    private lazy var availableIconStyles: [(symbol: String, labelKey: String)] = {
         kIconStyleCandidates.filter {
             NSImage(systemSymbolName: $0.symbol, accessibilityDescription: nil) != nil
         }
@@ -100,13 +101,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let selected  = resolvedSelectedID()
 
         if externals.isEmpty {
-            let item = NSMenuItem(title: "Kein externer Bildschirm", action: nil, keyEquivalent: "")
+            let item = NSMenuItem(title: L("no_external_display"), action: nil, keyEquivalent: "")
             item.isEnabled = false
             menu.addItem(item)
         } else {
             for id in externals {
                 let isDisplayLink = DisplayManager.shared.isDisplayLinkDisplay(id)
-                let title = DisplayManager.shared.displayName(id) + (isDisplayLink ? " (USB)" : "")
+                let title = DisplayManager.shared.displayName(id) + (isDisplayLink ? L("usb_suffix") : "")
                 let item  = NSMenuItem(
                     title:         title,
                     action:        isDisplayLink ? nil : #selector(selectDisplay(_:)),
@@ -122,13 +123,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Optionen-Untermenü
         menu.addItem(.separator())
-        let optionen     = NSMenuItem(title: "Optionen", action: nil, keyEquivalent: "")
-        let optionenMenu = NSMenu(title: "Optionen")
+        let optionen     = NSMenuItem(title: L("options_menu"), action: nil, keyEquivalent: "")
+        let optionenMenu = NSMenu(title: L("options_menu"))
         optionen.submenu = optionenMenu
 
         // Autostart
         let autoItem = NSMenuItem(
-            title:          "Mit Computer starten",
+            title:          L("launch_at_login"),
             action:         #selector(toggleAutoStart(_:)),
             keyEquivalent:  ""
         )
@@ -139,14 +140,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         optionenMenu.addItem(.separator())
 
         // Icon-Untermenü
-        let iconEntry    = NSMenuItem(title: "Icon", action: nil, keyEquivalent: "")
-        let iconMenu     = NSMenu(title: "Icon")
+        let iconEntry    = NSMenuItem(title: L("icon_menu"), action: nil, keyEquivalent: "")
+        let iconMenu     = NSMenu(title: L("icon_menu"))
         iconEntry.submenu = iconMenu
         let currentSymbol = UserDefaults.standard.string(forKey: kIconStyleKey)
             ?? availableIconStyles.first?.symbol ?? "display"
         for style in availableIconStyles {
             let item = NSMenuItem(
-                title:         style.label,
+                title:         L(style.labelKey),
                 action:        #selector(selectIconStyle(_:)),
                 keyEquivalent: ""
             )
@@ -165,7 +166,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Beenden
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Beenden", action: #selector(NSApp.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: L("quit_app"), action: #selector(NSApp.terminate(_:)), keyEquivalent: "q"))
 
         // Menü direkt unter dem Icon anzeigen
         statusItem.menu = menu
@@ -194,7 +195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard let id = resolvedSelectedID() else {
             button.image = NSImage(systemSymbolName: "display.trianglebadge.exclamationmark",
-                                   accessibilityDescription: "Kein externer Monitor")
+                                   accessibilityDescription: L("no_external_monitor"))
             button.image?.isTemplate = true
             button.contentTintColor  = nil
             return
@@ -202,7 +203,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let isOn = DisplayManager.shared.isEnabled(id)
         button.image = NSImage(systemSymbolName: symbol,
-                               accessibilityDescription: isOn ? "Monitor an" : "Monitor aus")
+                               accessibilityDescription: isOn ? L("display_on") : L("display_off"))
         button.image?.isTemplate = true
         button.contentTintColor  = isOn ? nil : .tertiaryLabelColor
     }

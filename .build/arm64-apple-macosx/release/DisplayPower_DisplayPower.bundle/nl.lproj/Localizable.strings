@@ -1,0 +1,30 @@
+/* Menu */
+"no_external_display" = "Geen extern beeldscherm";
+"usb_suffix" = " (USB)";
+"options_menu" = "Opties";
+"launch_at_login" = "Starten bij aanmelden";
+"icon_menu" = "Pictogram";
+"quit_app" = "Stop";
+
+/* Toegankelijkheid */
+"display_on" = "Monitor aan";
+"display_off" = "Monitor uit";
+"no_external_monitor" = "Geen extern monitor";
+
+/* Weergavenaam fallback */
+"display_fallback" = "Beeldscherm";
+
+/* Pictogramstijllabels */
+"icon_monitor" = "Monitor";
+"icon_two_monitors" = "Twee monitoren";
+"icon_desktop_computer" = "Desktopcomputer";
+"icon_tv" = "Televisie";
+"icon_tv_filled" = "Televisie (gevuld)";
+"icon_tv_inset" = "Televisie (inzet)";
+"icon_screen_area" = "Schermgebied";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "Kabelconnector";
+"icon_cable_connector_h" = "Kabelconnector (horizontaal)";
+"icon_coaxial" = "Coaxiaal kabel";
+"icon_plug" = "Stekker";
+"icon_plug_filled" = "Stekker (gevuld)";

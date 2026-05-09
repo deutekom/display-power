@@ -1,0 +1,30 @@
+/* Menu */
+"no_external_display" = "No External Display";
+"usb_suffix" = " (USB)";
+"options_menu" = "Options";
+"launch_at_login" = "Launch at Login";
+"icon_menu" = "Icon";
+"quit_app" = "Quit";
+
+/* Accessibility */
+"display_on" = "Display On";
+"display_off" = "Display Off";
+"no_external_monitor" = "No External Monitor";
+
+/* Display name fallback */
+"display_fallback" = "Display";
+
+/* Icon style labels */
+"icon_monitor" = "Monitor";
+"icon_two_monitors" = "Two Monitors";
+"icon_desktop_computer" = "Desktop Computer";
+"icon_tv" = "Television";
+"icon_tv_filled" = "Television (Filled)";
+"icon_tv_inset" = "Television (Inset)";
+"icon_screen_area" = "Screen Area";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "Cable Connector";
+"icon_cable_connector_h" = "Cable Connector (Horizontal)";
+"icon_coaxial" = "Coaxial Cable";
+"icon_plug" = "Plug";
+"icon_plug_filled" = "Plug (Filled)";

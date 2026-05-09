@@ -1,0 +1,30 @@
+/* Menu */
+"no_external_display" = "Nessun display esterno";
+"usb_suffix" = " (USB)";
+"options_menu" = "Opzioni";
+"launch_at_login" = "Avvia all'accesso";
+"icon_menu" = "Icona";
+"quit_app" = "Esci";
+
+/* Accessibilità */
+"display_on" = "Monitor acceso";
+"display_off" = "Monitor spento";
+"no_external_monitor" = "Nessun monitor esterno";
+
+/* Nome display di riserva */
+"display_fallback" = "Display";
+
+/* Etichette stile icona */
+"icon_monitor" = "Monitor";
+"icon_two_monitors" = "Due monitor";
+"icon_desktop_computer" = "Computer desktop";
+"icon_tv" = "Televisore";
+"icon_tv_filled" = "Televisore (pieno)";
+"icon_tv_inset" = "Televisore (inset)";
+"icon_screen_area" = "Area schermo";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "Connettore cavo";
+"icon_cable_connector_h" = "Connettore cavo (orizzontale)";
+"icon_coaxial" = "Cavo coassiale";
+"icon_plug" = "Spina";
+"icon_plug_filled" = "Spina (piena)";

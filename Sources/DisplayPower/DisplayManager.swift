@@ -123,7 +123,7 @@ final class DisplayManager {
         }
         // Deaktivierte Displays erscheinen nicht in NSScreen.screens
         // → Cache liefert den zuletzt bekannten Namen
-        return nameCache[id] ?? "Bildschirm \(id)"
+        return nameCache[id] ?? "\(L("display_fallback")) \(id)"
     }
 
     // Alle aktuell aktiven externen Displays im Cache speichern

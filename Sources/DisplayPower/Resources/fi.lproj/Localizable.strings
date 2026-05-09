@@ -1,0 +1,30 @@
+/* Valikko */
+"no_external_display" = "Ei ulkoista näyttöä";
+"usb_suffix" = " (USB)";
+"options_menu" = "Asetukset";
+"launch_at_login" = "Käynnistä kirjautumisen yhteydessä";
+"icon_menu" = "Kuvake";
+"quit_app" = "Lopeta";
+
+/* Saavutettavuus */
+"display_on" = "Näyttö päällä";
+"display_off" = "Näyttö pois";
+"no_external_monitor" = "Ei ulkoista monitoria";
+
+/* Varanäytön nimi */
+"display_fallback" = "Näyttö";
+
+/* Kuvaketyylien nimet */
+"icon_monitor" = "Näyttö";
+"icon_two_monitors" = "Kaksi näyttöä";
+"icon_desktop_computer" = "Pöytätietokone";
+"icon_tv" = "Televisio";
+"icon_tv_filled" = "Televisio (täytetty)";
+"icon_tv_inset" = "Televisio (upotettu)";
+"icon_screen_area" = "Näyttöalue";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "Kaapeliliitin";
+"icon_cable_connector_h" = "Kaapeliliitin (vaakasuora)";
+"icon_coaxial" = "Koaksiaalikaapeli";
+"icon_plug" = "Pistoke";
+"icon_plug_filled" = "Pistoke (täytetty)";

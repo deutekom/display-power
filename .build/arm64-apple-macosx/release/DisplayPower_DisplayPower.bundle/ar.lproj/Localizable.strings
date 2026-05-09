@@ -1,0 +1,30 @@
+/* القائمة */
+"no_external_display" = "لا توجد شاشة خارجية";
+"usb_suffix" = " (USB)";
+"options_menu" = "خيارات";
+"launch_at_login" = "التشغيل عند تسجيل الدخول";
+"icon_menu" = "أيقونة";
+"quit_app" = "إنهاء";
+
+/* إمكانية الوصول */
+"display_on" = "الشاشة شغّالة";
+"display_off" = "الشاشة مطفأة";
+"no_external_monitor" = "لا يوجد شاشة خارجية";
+
+/* اسم شاشة احتياطي */
+"display_fallback" = "شاشة";
+
+/* تسميات نمط الأيقونة */
+"icon_monitor" = "شاشة";
+"icon_two_monitors" = "شاشتان";
+"icon_desktop_computer" = "حاسوب مكتبي";
+"icon_tv" = "تلفاز";
+"icon_tv_filled" = "تلفاز (ممتلئ)";
+"icon_tv_inset" = "تلفاز (مدمج)";
+"icon_screen_area" = "منطقة الشاشة";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "موصل الكابل";
+"icon_cable_connector_h" = "موصل الكابل (أفقي)";
+"icon_coaxial" = "كابل محوري";
+"icon_plug" = "قابس";
+"icon_plug_filled" = "قابس (ممتلئ)";

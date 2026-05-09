@@ -1,0 +1,30 @@
+/* 選單 */
+"no_external_display" = "無外部顯示器";
+"usb_suffix" = "（USB）";
+"options_menu" = "選項";
+"launch_at_login" = "登入時啟動";
+"icon_menu" = "圖示";
+"quit_app" = "結束";
+
+/* 輔助功能 */
+"display_on" = "顯示器開啟";
+"display_off" = "顯示器關閉";
+"no_external_monitor" = "無外部顯示器";
+
+/* 顯示器名稱備用 */
+"display_fallback" = "顯示器";
+
+/* 圖示樣式標籤 */
+"icon_monitor" = "顯示器";
+"icon_two_monitors" = "雙顯示器";
+"icon_desktop_computer" = "桌上型電腦";
+"icon_tv" = "電視";
+"icon_tv_filled" = "電視（填充）";
+"icon_tv_inset" = "電視（嵌入）";
+"icon_screen_area" = "螢幕區域";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "線纜連接器";
+"icon_cable_connector_h" = "線纜連接器（水平）";
+"icon_coaxial" = "同軸電纜";
+"icon_plug" = "插頭";
+"icon_plug_filled" = "插頭（填充）";

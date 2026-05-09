@@ -8,7 +8,14 @@
       "Bash(git config:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(swiftc:*)"
+      "Bash(swiftc:*)",
+      "Bash(.build/release/DisplayPower)",
+      "Bash(killall DisplayPower)",
+      "Bash(git -C /Users/deutekom/claude-code/display-power show 86775be:Sources/DisplayPower/AppDelegate.swift)",
+      "Bash(git -C /Users/deutekom/claude-code/display-power show 2db3552:Sources/DisplayPower/AppDelegate.swift)",
+      "Bash(git -C /Users/deutekom/claude-code/display-power show 8edb4ac:Sources/DisplayPower/SettingsViewController.swift)",
+      "Bash(swift test:*)",
+      "Bash(git rm:*)"
     ]
   }
 }

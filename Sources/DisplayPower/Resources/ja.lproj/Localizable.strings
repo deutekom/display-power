@@ -1,0 +1,30 @@
+/* メニュー */
+"no_external_display" = "外部ディスプレイなし";
+"usb_suffix" = "（USB）";
+"options_menu" = "オプション";
+"launch_at_login" = "ログイン時に起動";
+"icon_menu" = "アイコン";
+"quit_app" = "終了";
+
+/* アクセシビリティ */
+"display_on" = "モニターオン";
+"display_off" = "モニターオフ";
+"no_external_monitor" = "外部モニターなし";
+
+/* ディスプレイ名フォールバック */
+"display_fallback" = "ディスプレイ";
+
+/* アイコンスタイルラベル */
+"icon_monitor" = "モニター";
+"icon_two_monitors" = "2台のモニター";
+"icon_desktop_computer" = "デスクトップコンピュータ";
+"icon_tv" = "テレビ";
+"icon_tv_filled" = "テレビ（塗りつぶし）";
+"icon_tv_inset" = "テレビ（インセット）";
+"icon_screen_area" = "画面領域";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "ケーブルコネクタ";
+"icon_cable_connector_h" = "ケーブルコネクタ（横）";
+"icon_coaxial" = "同軸ケーブル";
+"icon_plug" = "プラグ";
+"icon_plug_filled" = "プラグ（塗りつぶし）";

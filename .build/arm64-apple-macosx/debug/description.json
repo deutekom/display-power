@@ -24,11 +24,11 @@
       "inputs" : [
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/AppDelegate.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/SettingsViewController.swift"
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
         },
         {
           "kind" : "file",
@@ -47,8 +47,8 @@
       "moduleName" : "DisplayPower",
       "moduleOutputPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules/DisplayPower.swiftmodule",
       "objects" : [
+        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/AppDelegate.swift.o",
         "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o",
-        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.swift.o",
         "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.swift.o"
       ],
       "otherArguments" : [
@@ -85,6 +85,7 @@
         "-L",
         "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
         "-g",
+        "-DDEBUG",
         "-Xcc",
         "-isysroot",
         "-Xcc",
@@ -104,11 +105,11 @@
       "outputs" : [
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/AppDelegate.swift.o"
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.swift.o"
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
         },
         {
           "kind" : "file",
@@ -121,8 +122,8 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
+        "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/AppDelegate.swift",
         "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift",
-        "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/SettingsViewController.swift",
         "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift"
       ],
       "tempsPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build",
@@ -140,8 +141,8 @@
       "-package-name",
       "display_power",
       "-c",
+      "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/AppDelegate.swift",
       "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift",
-      "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/SettingsViewController.swift",
       "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift",
       "-I",
       "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules",
@@ -178,6 +179,7 @@
       "-L",
       "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
       "-g",
+      "-DDEBUG",
       "-Xcc",
       "-isysroot",
       "-Xcc",
@@ -236,11 +238,11 @@
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/AppDelegate.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/SettingsViewController.swift"
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
         },
         {
           "kind" : "file",
@@ -258,11 +260,11 @@
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/AppDelegate.swift.o"
         },
         {
           "kind" : "file",
-          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/SettingsViewController.swift.o"
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
         },
         {
           "kind" : "file",

@@ -1,0 +1,30 @@
+/* Menu */
+"no_external_display" = "Ingen ekstern skærm";
+"usb_suffix" = " (USB)";
+"options_menu" = "Indstillinger";
+"launch_at_login" = "Start ved login";
+"icon_menu" = "Ikon";
+"quit_app" = "Afslut";
+
+/* Tilgængelighed */
+"display_on" = "Skærm til";
+"display_off" = "Skærm fra";
+"no_external_monitor" = "Ingen ekstern skærm";
+
+/* Reservevisningsnavn */
+"display_fallback" = "Skærm";
+
+/* Ikonstiletiket */
+"icon_monitor" = "Skærm";
+"icon_two_monitors" = "To skærme";
+"icon_desktop_computer" = "Stationær computer";
+"icon_tv" = "Fjernsyn";
+"icon_tv_filled" = "Fjernsyn (fyldt)";
+"icon_tv_inset" = "Fjernsyn (indsat)";
+"icon_screen_area" = "Skærmområde";
+"icon_hdmi" = "HDMI";
+"icon_cable_connector" = "Kabelstik";
+"icon_cable_connector_h" = "Kabelstik (vandret)";
+"icon_coaxial" = "Koaksialkabel";
+"icon_plug" = "Stik";
+"icon_plug_filled" = "Stik (fyldt)";
