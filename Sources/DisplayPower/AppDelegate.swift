@@ -105,14 +105,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(item)
         } else {
             for id in externals {
-                let item = NSMenuItem(
-                    title: DisplayManager.shared.displayName(id),
-                    action: #selector(selectDisplay(_:)),
+                let native = DisplayManager.shared.isNativeDisplay(id)
+                let title  = DisplayManager.shared.displayName(id) + (native ? "" : " (USB)")
+                let item   = NSMenuItem(
+                    title:         title,
+                    action:        native ? #selector(selectDisplay(_:)) : nil,
                     keyEquivalent: ""
                 )
-                item.target = self
-                item.tag    = Int(id)
-                item.state  = id == selected ? .on : .off
+                item.target    = native ? self : nil
+                item.tag       = Int(id)
+                item.state     = id == selected ? .on : .off
+                item.isEnabled = native
                 menu.addItem(item)
             }
         }
@@ -260,16 +263,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Hilfsmethoden
 
-    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen.
-    // Fällt auf das erste verfügbare externe Display zurück.
+    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen und nativ (HDMI/DP).
+    // Fällt auf das erste verfügbare native Display zurück.
     private func resolvedSelectedID() -> CGDirectDisplayID? {
-        let externals = DisplayManager.shared.externalDisplayIDs()
-        guard !externals.isEmpty else { return nil }
+        let natives = DisplayManager.shared.externalDisplayIDs()
+            .filter { DisplayManager.shared.isNativeDisplay($0) }
+        guard !natives.isEmpty else { return nil }
 
         let stored = CGDirectDisplayID(UInt32(UserDefaults.standard.integer(forKey: kSelectedDisplayKey)))
-        if stored != 0, externals.contains(stored) { return stored }
+        if stored != 0, natives.contains(stored) { return stored }
 
-        let first = externals[0]
+        let first = natives[0]
         UserDefaults.standard.set(Int(first), forKey: kSelectedDisplayKey)
         return first
     }

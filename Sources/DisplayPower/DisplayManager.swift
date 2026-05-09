@@ -1,5 +1,6 @@
 import AppKit
 import CoreGraphics
+import IOKit
 
 @MainActor
 final class DisplayManager {
@@ -45,6 +46,45 @@ final class DisplayManager {
 
     func toggle(_ id: CGDirectDisplayID) {
         isEnabled(id) ? disable(id) : enable(id)
+    }
+
+    // True = Display ist nativ angeschlossen (HDMI, DisplayPort, Thunderbolt).
+    // False = USB-DisplayLink-Adapter: lässt sich nicht per CGConfigureDisplayMirrorOfDisplay steuern.
+    //
+    // Strategie: passendes IODisplayConnect via Vendor/Product-ID suchen,
+    // dann prüfen ob ein USB-Gerät in der Elternkette sitzt.
+    func isNativeDisplay(_ id: CGDirectDisplayID) -> Bool {
+        let vendor  = CGDisplayVendorNumber(id)
+        let product = CGDisplayModelNumber(id)
+        let serial  = CGDisplaySerialNumber(id)
+
+        guard let baseMatch = IOServiceMatching("IODisplayConnect") else { return true }
+        let matchDict = baseMatch as NSMutableDictionary
+        matchDict["DisplayVendorID"]  = NSNumber(value: vendor)
+        matchDict["DisplayProductID"] = NSNumber(value: product)
+        if serial != 0 {
+            matchDict["DisplaySerialNumber"] = NSNumber(value: serial)
+        }
+
+        var iter: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matchDict, &iter) == KERN_SUCCESS else {
+            return true // Nicht feststellbar → nativ annehmen
+        }
+        defer { IOObjectRelease(iter) }
+
+        var service = IOIteratorNext(iter)
+        while service != IO_OBJECT_NULL {
+            defer { IOObjectRelease(service); service = IOIteratorNext(iter) }
+            // USB-Displays haben 'idVendor' irgendwo in der Elternkette
+            let hasUSB = IORegistryEntrySearchCFProperty(
+                service, kIOServicePlane, "idVendor" as CFString,
+                kCFAllocatorDefault,
+                IOOptionBits(kIORegistryIterateParents | kIORegistryIterateRecursively)
+            ) != nil
+            return !hasUSB
+        }
+
+        return true // Kein Match → nativ annehmen
     }
 
     // Display-Namen: aktive Screens bevorzugt, Cache als Fallback
