@@ -2,8 +2,14 @@ import AppKit
 import CoreGraphics
 import IOKit
 
-// Signatur der privaten CoreDisplay-Funktion
-private typealias SetUserEnabledFn = @convention(c) (CGDirectDisplayID, Bool) -> Void
+// CGS private API in CoreGraphics – verfügbar auf macOS 10.x bis 16+
+// Funktioniert für alle Verbindungsarten: HDMI, DisplayPort, USB-C, Thunderbolt
+private typealias CGSConnectionID = UInt32
+private typealias CGSConfigureDisplayEnabledFn = @convention(c) (CGSConnectionID, CGDirectDisplayID, Bool) -> Void
+private typealias CGSMainConnectionIDFn      = @convention(c) () -> CGSConnectionID
+
+// Ältere Fallback-API (CoreDisplay, macOS 10.x–15.x)
+private typealias CoreDisplaySetUserEnabledFn = @convention(c) (CGDirectDisplayID, Bool) -> Void
 
 @MainActor
 final class DisplayManager {
@@ -12,19 +18,36 @@ final class DisplayManager {
     // Speichert Namen von Displays, auch wenn diese gerade deaktiviert/gespiegelt sind
     private var nameCache: [CGDirectDisplayID: String] = [:]
 
-    // Zeiger auf CoreDisplay_Display_SetUserEnabled (privat, aber stabil seit macOS 10.x)
-    // Funktioniert für alle Verbindungsarten: HDMI, DisplayPort, USB-C, Thunderbolt
-    private let coreDisplaySetEnabled: SetUserEnabledFn?
+    // Primär: CGSConfigureDisplayEnabled aus CoreGraphics (macOS 16+)
+    private let cgsSetEnabled: CGSConfigureDisplayEnabledFn?
+    private let cgsConnection: CGSConnectionID
+
+    // Fallback: CoreDisplay_Display_SetUserEnabled (macOS 10.x–15.x)
+    private let coreDisplaySetEnabled: CoreDisplaySetUserEnabledFn?
 
     private init() {
-        if let handle = dlopen(
-            "/System/Library/Frameworks/CoreDisplay.framework/CoreDisplay",
-            RTLD_LAZY
-        ), let sym = dlsym(handle, "CoreDisplay_Display_SetUserEnabled") {
-            coreDisplaySetEnabled = unsafeBitCast(sym, to: SetUserEnabledFn.self)
+        var cgs: CGSConfigureDisplayEnabledFn? = nil
+        var conn: CGSConnectionID = 0
+
+        if let h = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY),
+           let sym = dlsym(h, "CGSConfigureDisplayEnabled") {
+            cgs = unsafeBitCast(sym, to: CGSConfigureDisplayEnabledFn.self)
+            if let connSym = dlsym(h, "CGSMainConnectionID") {
+                conn = unsafeBitCast(connSym, to: CGSMainConnectionIDFn.self)()
+            }
+        }
+        cgsSetEnabled = cgs
+        cgsConnection = conn
+
+        // CoreDisplay nur laden wenn CGS nicht verfügbar (älteres macOS)
+        if cgs == nil,
+           let h = dlopen("/System/Library/Frameworks/CoreDisplay.framework/CoreDisplay", RTLD_LAZY),
+           let sym = dlsym(h, "CoreDisplay_Display_SetUserEnabled") {
+            coreDisplaySetEnabled = unsafeBitCast(sym, to: CoreDisplaySetUserEnabledFn.self)
         } else {
             coreDisplaySetEnabled = nil
         }
+
         refreshNameCache()
     }
 
@@ -38,8 +61,7 @@ final class DisplayManager {
 
     // True = Display ist aktiv (nicht deaktiviert oder gespiegelt)
     func isEnabled(_ id: CGDirectDisplayID) -> Bool {
-        if coreDisplaySetEnabled != nil {
-            // CoreDisplay: Display ist "an" wenn es in der aktiven Liste ist
+        if cgsSetEnabled != nil || coreDisplaySetEnabled != nil {
             return CGDisplayIsActive(id) != 0
         }
         // Fallback Mirroring: "an" = kein Spiegeln
@@ -48,11 +70,15 @@ final class DisplayManager {
 
     // Display deaktivieren: Fenster wandern auf andere Displays
     func disable(_ id: CGDirectDisplayID) {
+        if let fn = cgsSetEnabled, cgsConnection != 0 {
+            fn(cgsConnection, id, false)
+            return
+        }
         if let fn = coreDisplaySetEnabled {
             fn(id, false)
             return
         }
-        // Fallback: CoreGraphics Mirroring
+        // Letzter Fallback: CoreGraphics Mirroring
         let main = CGMainDisplayID()
         guard id != main else { return }
         var config: CGDisplayConfigRef?
@@ -63,6 +89,10 @@ final class DisplayManager {
 
     // Display aktivieren
     func enable(_ id: CGDirectDisplayID) {
+        if let fn = cgsSetEnabled, cgsConnection != 0 {
+            fn(cgsConnection, id, true)
+            return
+        }
         if let fn = coreDisplaySetEnabled {
             fn(id, true)
             return
