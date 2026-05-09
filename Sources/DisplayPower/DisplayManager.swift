@@ -2,18 +2,33 @@ import AppKit
 import CoreGraphics
 import IOKit
 
+// Signatur der privaten CoreDisplay-Funktion
+private typealias SetUserEnabledFn = @convention(c) (CGDirectDisplayID, Bool) -> Void
+
 @MainActor
 final class DisplayManager {
     static let shared = DisplayManager()
 
-    // Speichert Namen von Displays, auch wenn diese gerade gespiegelt/offline sind
+    // Speichert Namen von Displays, auch wenn diese gerade deaktiviert/gespiegelt sind
     private var nameCache: [CGDirectDisplayID: String] = [:]
 
+    // Zeiger auf CoreDisplay_Display_SetUserEnabled (privat, aber stabil seit macOS 10.x)
+    // Funktioniert für alle Verbindungsarten: HDMI, DisplayPort, USB-C, Thunderbolt
+    private let coreDisplaySetEnabled: SetUserEnabledFn?
+
     private init() {
+        if let handle = dlopen(
+            "/System/Library/Frameworks/CoreDisplay.framework/CoreDisplay",
+            RTLD_LAZY
+        ), let sym = dlsym(handle, "CoreDisplay_Display_SetUserEnabled") {
+            coreDisplaySetEnabled = unsafeBitCast(sym, to: SetUserEnabledFn.self)
+        } else {
+            coreDisplaySetEnabled = nil
+        }
         refreshNameCache()
     }
 
-    // Alle angeschlossenen externen Displays (inkl. gespiegelter)
+    // Alle angeschlossenen externen Displays (inkl. deaktivierter)
     func externalDisplayIDs() -> [CGDirectDisplayID] {
         var ids = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
@@ -21,13 +36,23 @@ final class DisplayManager {
         return Array(ids[0..<Int(count)]).filter { CGDisplayIsBuiltin($0) == 0 }
     }
 
-    // True = Display ist eigenständig (nicht gespiegelt)
+    // True = Display ist aktiv (nicht deaktiviert oder gespiegelt)
     func isEnabled(_ id: CGDirectDisplayID) -> Bool {
-        CGDisplayMirrorsDisplay(id) == kCGNullDirectDisplay
+        if coreDisplaySetEnabled != nil {
+            // CoreDisplay: Display ist "an" wenn es in der aktiven Liste ist
+            return CGDisplayIsActive(id) != 0
+        }
+        // Fallback Mirroring: "an" = kein Spiegeln
+        return CGDisplayMirrorsDisplay(id) == kCGNullDirectDisplay
     }
 
-    // Display deaktivieren: spiegelt den Hauptmonitor → Fenster wandern dorthin
+    // Display deaktivieren: Fenster wandern auf andere Displays
     func disable(_ id: CGDirectDisplayID) {
+        if let fn = coreDisplaySetEnabled {
+            fn(id, false)
+            return
+        }
+        // Fallback: CoreGraphics Mirroring
         let main = CGMainDisplayID()
         guard id != main else { return }
         var config: CGDisplayConfigRef?
@@ -36,8 +61,12 @@ final class DisplayManager {
         CGCompleteDisplayConfiguration(config, .forSession)
     }
 
-    // Display aktivieren: Mirroring aufheben → Display wird wieder eigenständig
+    // Display aktivieren
     func enable(_ id: CGDirectDisplayID) {
+        if let fn = coreDisplaySetEnabled {
+            fn(id, true)
+            return
+        }
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
         CGConfigureDisplayMirrorOfDisplay(config, id, kCGNullDirectDisplay)
@@ -48,10 +77,8 @@ final class DisplayManager {
         isEnabled(id) ? disable(id) : enable(id)
     }
 
-    // True = Display ist per USB-DisplayLink angebunden (Synaptics/DisplayLink, Vendor-ID 0x17E9).
-    // Solche Displays lassen sich nicht per CGConfigureDisplayMirrorOfDisplay steuern.
-    //
-    // HDMI über USB-C-Adapter gilt NICHT als DisplayLink und wird korrekt als nativ behandelt.
+    // True = USB-DisplayLink-Adapter (Synaptics/DisplayLink, Vendor-ID 0x17E9).
+    // Solche Displays lassen sich nicht über diese App steuern.
     func isDisplayLinkDisplay(_ id: CGDirectDisplayID) -> Bool {
         let vendor  = CGDisplayVendorNumber(id)
         let product = CGDisplayModelNumber(id)
@@ -74,7 +101,6 @@ final class DisplayManager {
         var service = IOIteratorNext(iter)
         while service != IO_OBJECT_NULL {
             defer { IOObjectRelease(service); service = IOIteratorNext(iter) }
-            // DisplayLink-Adapter haben Hersteller-ID 0x17E9 in der Elternkette
             if let vendorRef = IORegistryEntrySearchCFProperty(
                 service, kIOServicePlane, "idVendor" as CFString,
                 kCFAllocatorDefault,
@@ -95,7 +121,7 @@ final class DisplayManager {
                 return screen.localizedName
             }
         }
-        // Gespiegelte/deaktivierte Displays erscheinen nicht in NSScreen.screens
+        // Deaktivierte Displays erscheinen nicht in NSScreen.screens
         // → Cache liefert den zuletzt bekannten Namen
         return nameCache[id] ?? "Bildschirm \(id)"
     }
