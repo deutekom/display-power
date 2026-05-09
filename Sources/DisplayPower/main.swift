@@ -1,3 +1,10 @@
-// Sources/DisplayPower/main.swift
 import AppKit
-print("DisplayPower gestartet")
+
+let app = NSApplication.shared
+app.setActivationPolicy(.accessory)
+
+let delegate = AppDelegate()
+app.delegate = delegate
+
+app.run()
+

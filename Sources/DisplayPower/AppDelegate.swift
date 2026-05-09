@@ -5,6 +5,10 @@ private let kSelectedDisplayKey = "selectedDisplayID"
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    nonisolated override init() {
+        super.init()
+    }
+
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var settingsVC: SettingsViewController!
