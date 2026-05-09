@@ -2,6 +2,14 @@ import AppKit
 import CoreGraphics
 
 private let kSelectedDisplayKey = "selectedDisplayID"
+private let kIconStyleKey       = "iconStyle"
+private let kLaunchAgentLabel   = "com.user.displaypower"
+
+// Verfügbare Icon-Stile mit SF-Symbol-Name und Anzeige-Label
+private let kIconStyles: [(symbol: String, label: String)] = [
+    ("display",           "Monitor"),
+    ("cable.connector",   "Kabel-Stecker (HDMI)"),
+]
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -67,8 +75,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showMenu(from button: NSStatusBarButton) {
         let menu = NSMenu()
 
+        // Monitor-Auswahl
         let externals = DisplayManager.shared.externalDisplayIDs()
-        let selected = resolvedSelectedID()
+        let selected  = resolvedSelectedID()
 
         if externals.isEmpty {
             let item = NSMenuItem(title: "Kein externer Bildschirm", action: nil, keyEquivalent: "")
@@ -82,12 +91,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     keyEquivalent: ""
                 )
                 item.target = self
-                item.tag = Int(id)
-                item.state = id == selected ? .on : .off
+                item.tag    = Int(id)
+                item.state  = id == selected ? .on : .off
                 menu.addItem(item)
             }
         }
 
+        // Optionen-Untermenü
+        menu.addItem(.separator())
+        let optionen     = NSMenuItem(title: "Optionen", action: nil, keyEquivalent: "")
+        let optionenMenu = NSMenu(title: "Optionen")
+        optionen.submenu = optionenMenu
+
+        // Autostart
+        let autoItem = NSMenuItem(
+            title:          "Mit Computer starten",
+            action:         #selector(toggleAutoStart(_:)),
+            keyEquivalent:  ""
+        )
+        autoItem.target = self
+        autoItem.state  = isAutoStartEnabled() ? .on : .off
+        optionenMenu.addItem(autoItem)
+
+        optionenMenu.addItem(.separator())
+
+        // Icon-Auswahl
+        let currentSymbol = UserDefaults.standard.string(forKey: kIconStyleKey) ?? kIconStyles[0].symbol
+        for style in kIconStyles {
+            let iconItem = NSMenuItem(
+                title:         style.label,
+                action:        #selector(selectIconStyle(_:)),
+                keyEquivalent: ""
+            )
+            iconItem.target         = self
+            iconItem.representedObject = style.symbol
+            iconItem.state          = style.symbol == currentSymbol ? .on : .off
+            // Kleines Vorschau-Icon links neben dem Text
+            if let img = NSImage(systemSymbolName: style.symbol, accessibilityDescription: nil) {
+                img.isTemplate   = true
+                iconItem.image   = img
+            }
+            optionenMenu.addItem(iconItem)
+        }
+
+        menu.addItem(optionen)
+
+        // Beenden
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Beenden", action: #selector(NSApp.terminate(_:)), keyEquivalent: "q"))
 
@@ -98,8 +147,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func selectDisplay(_ sender: NSMenuItem) {
-        let id = CGDirectDisplayID(sender.tag)
-        UserDefaults.standard.set(Int(id), forKey: kSelectedDisplayKey)
+        UserDefaults.standard.set(sender.tag, forKey: kSelectedDisplayKey)
+        updateStatusIcon()
+    }
+
+    @objc private func selectIconStyle(_ sender: NSMenuItem) {
+        guard let symbol = sender.representedObject as? String else { return }
+        UserDefaults.standard.set(symbol, forKey: kIconStyleKey)
         updateStatusIcon()
     }
 
@@ -108,21 +162,75 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusIcon() {
         guard let button = statusItem.button else { return }
 
+        let symbol = UserDefaults.standard.string(forKey: kIconStyleKey) ?? kIconStyles[0].symbol
+
         guard let id = resolvedSelectedID() else {
-            // Kein externer Monitor vorhanden
             button.image = NSImage(systemSymbolName: "display.trianglebadge.exclamationmark",
                                    accessibilityDescription: "Kein externer Monitor")
             button.image?.isTemplate = true
-            button.contentTintColor = nil
+            button.contentTintColor  = nil
             return
         }
 
         let isOn = DisplayManager.shared.isEnabled(id)
-        button.image = NSImage(systemSymbolName: "display",
+        button.image = NSImage(systemSymbolName: symbol,
                                accessibilityDescription: isOn ? "Monitor an" : "Monitor aus")
         button.image?.isTemplate = true
-        // Gedimmt = Monitor deaktiviert (gespiegelt)
-        button.contentTintColor = isOn ? nil : .tertiaryLabelColor
+        button.contentTintColor  = isOn ? nil : .tertiaryLabelColor
+    }
+
+    // MARK: - Autostart
+
+    private var launchAgentPlistURL: URL {
+        let support = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/LaunchAgents")
+        return support.appendingPathComponent("\(kLaunchAgentLabel).plist")
+    }
+
+    private func isAutoStartEnabled() -> Bool {
+        FileManager.default.fileExists(atPath: launchAgentPlistURL.path)
+    }
+
+    @objc private func toggleAutoStart(_ sender: NSMenuItem) {
+        if isAutoStartEnabled() {
+            disableAutoStart()
+        } else {
+            enableAutoStart()
+        }
+    }
+
+    private func enableAutoStart() {
+        // Pfad zum aktuell laufenden Executable
+        let execPath = URL(fileURLWithPath: ProcessInfo.processInfo.arguments[0])
+            .resolvingSymlinksInPath().path
+
+        let plist: NSDictionary = [
+            "Label":           kLaunchAgentLabel,
+            "ProgramArguments": [execPath],
+            "RunAtLoad":       true,
+            "KeepAlive":       false,
+        ]
+
+        try? FileManager.default.createDirectory(
+            at: launchAgentPlistURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        plist.write(to: launchAgentPlistURL, atomically: true)
+
+        runLaunchctl(["load", launchAgentPlistURL.path])
+    }
+
+    private func disableAutoStart() {
+        runLaunchctl(["unload", launchAgentPlistURL.path])
+        try? FileManager.default.removeItem(at: launchAgentPlistURL)
+    }
+
+    private func runLaunchctl(_ args: [String]) {
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+        proc.arguments     = args
+        try? proc.run()
+        proc.waitUntilExit()
     }
 
     // MARK: - Hilfsmethoden
@@ -136,7 +244,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let stored = CGDirectDisplayID(UInt32(UserDefaults.standard.integer(forKey: kSelectedDisplayKey)))
         if stored != 0, externals.contains(stored) { return stored }
 
-        // Gespeicherte ID nicht mehr vorhanden → ersten externen Monitor wählen
         let first = externals[0]
         UserDefaults.standard.set(Int(first), forKey: kSelectedDisplayKey)
         return first
