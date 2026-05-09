@@ -28,3 +28,5 @@
 "icon_coaxial" = "同軸電纜";
 "icon_plug" = "插頭";
 "icon_plug_filled" = "插頭（填充）";
+
+"display_off_suffix" = "（關閉）";

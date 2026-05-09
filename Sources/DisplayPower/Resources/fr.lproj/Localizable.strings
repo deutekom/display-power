@@ -28,3 +28,5 @@
 "icon_coaxial" = "Câble coaxial";
 "icon_plug" = "Prise";
 "icon_plug_filled" = "Prise (plein)";
+
+"display_off_suffix" = " (éteint)";

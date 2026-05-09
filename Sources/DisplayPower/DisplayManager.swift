@@ -10,12 +10,22 @@ private typealias CGSConfigureDisplayEnabledFn = @convention(c) (CGDisplayConfig
 // Ältere Fallback-API (CoreDisplay, macOS 10.x–15.x)
 private typealias CoreDisplaySetUserEnabledFn = @convention(c) (CGDirectDisplayID, Bool) -> Void
 
+private let kDisabledIDsKey = "disabledDisplayIDs"
+
 @MainActor
 final class DisplayManager {
     static let shared = DisplayManager()
 
     // Speichert Namen von Displays, auch wenn diese gerade deaktiviert/gespiegelt sind
     private var nameCache: [CGDirectDisplayID: String] = [:]
+
+    // IDs von via CGSConfigureDisplayEnabled deaktivierten Displays.
+    // Diese verschwinden aus CGGetOnlineDisplayList und müssen separat verfolgt werden,
+    // damit sie im Menü bleiben und wieder eingeschaltet werden können.
+    private var disabledIDs: Set<CGDirectDisplayID> = {
+        let stored = UserDefaults.standard.array(forKey: kDisabledIDsKey) as? [Int] ?? []
+        return Set(stored.map { CGDirectDisplayID(UInt32($0)) })
+    }()
 
     // Primär: CGSConfigureDisplayEnabled aus CoreGraphics (macOS 16+)
     private let cgsSetEnabled: CGSConfigureDisplayEnabledFn?
@@ -43,43 +53,59 @@ final class DisplayManager {
         refreshNameCache()
     }
 
-    // Alle angeschlossenen externen Displays (inkl. deaktivierter)
+    // Alle angeschlossenen externen Displays inkl. der von uns deaktivierten.
+    // CGGetOnlineDisplayList liefert deaktivierte Displays nicht mehr zurück,
+    // deshalb werden die gespeicherten IDs ergänzt.
     func externalDisplayIDs() -> [CGDirectDisplayID] {
         var ids = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
         CGGetOnlineDisplayList(16, &ids, &count)
-        return Array(ids[0..<Int(count)]).filter { CGDisplayIsBuiltin($0) == 0 }
+        var result = Set(Array(ids[0..<Int(count)]).filter { CGDisplayIsBuiltin($0) == 0 })
+        result.formUnion(disabledIDs)
+        return Array(result)
     }
 
     // True = Display ist aktiv (nicht deaktiviert oder gespiegelt)
     func isEnabled(_ id: CGDirectDisplayID) -> Bool {
         if cgsSetEnabled != nil || coreDisplaySetEnabled != nil {
+            if disabledIDs.contains(id) { return false }
             return CGDisplayIsActive(id) != 0
         }
-        // Fallback Mirroring: "an" = kein Spiegeln
         return CGDisplayMirrorsDisplay(id) == kCGNullDirectDisplay
+    }
+
+    // True wenn dieses Display gerade der einzige aktive Bildschirm ist.
+    // In diesem Fall darf es nicht deaktiviert werden.
+    func isLastActiveDisplay(_ id: CGDirectDisplayID) -> Bool {
+        var activeIDs = [CGDirectDisplayID](repeating: 0, count: 16)
+        var activeCount: UInt32 = 0
+        CGGetActiveDisplayList(16, &activeIDs, &activeCount)
+        let others = Array(activeIDs[0..<Int(activeCount)]).filter { $0 != id }
+        return others.isEmpty
     }
 
     // Display deaktivieren: Fenster wandern auf andere Displays
     func disable(_ id: CGDirectDisplayID) {
+        guard !isLastActiveDisplay(id) else { return }
+
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
 
         if let fn = cgsSetEnabled {
-            // macOS 16+: privates CGS-API, unterstützt alle Anschlussarten inkl. USB-C
             _ = fn(config, id, false)
+            CGCompleteDisplayConfiguration(config, .forSession)
+            disabledIDs.insert(id)
+            saveDisabledIDs()
         } else if let fn = coreDisplaySetEnabled {
-            // macOS 10.x–15.x: CoreDisplay private API
             CGCancelDisplayConfiguration(config)
             fn(id, false)
-            return
         } else {
             // Letzter Fallback: Mirroring (nur HDMI/DP, kein USB-C)
             let main = CGMainDisplayID()
             guard id != main else { CGCancelDisplayConfiguration(config); return }
             CGConfigureDisplayMirrorOfDisplay(config, id, main)
+            CGCompleteDisplayConfiguration(config, .forSession)
         }
-        CGCompleteDisplayConfiguration(config, .forSession)
     }
 
     // Display aktivieren
@@ -89,18 +115,24 @@ final class DisplayManager {
 
         if let fn = cgsSetEnabled {
             _ = fn(config, id, true)
+            CGCompleteDisplayConfiguration(config, .forSession)
+            disabledIDs.remove(id)
+            saveDisabledIDs()
         } else if let fn = coreDisplaySetEnabled {
             CGCancelDisplayConfiguration(config)
             fn(id, true)
-            return
         } else {
             CGConfigureDisplayMirrorOfDisplay(config, id, kCGNullDirectDisplay)
+            CGCompleteDisplayConfiguration(config, .forSession)
         }
-        CGCompleteDisplayConfiguration(config, .forSession)
     }
 
     func toggle(_ id: CGDirectDisplayID) {
         isEnabled(id) ? disable(id) : enable(id)
+    }
+
+    private func saveDisabledIDs() {
+        UserDefaults.standard.set(Array(disabledIDs.map { Int($0) }), forKey: kDisabledIDsKey)
     }
 
     // True = USB-DisplayLink-Adapter (Synaptics/DisplayLink, Vendor-ID 0x17E9).
@@ -147,8 +179,6 @@ final class DisplayManager {
                 return screen.localizedName
             }
         }
-        // Deaktivierte Displays erscheinen nicht in NSScreen.screens
-        // → Cache liefert den zuletzt bekannten Namen
         return nameCache[id] ?? "\(L("display_fallback")) \(id)"
     }
 
@@ -161,6 +191,16 @@ final class DisplayManager {
                     nameCache[id] = screen.localizedName
                 }
             }
+        }
+        // Displays die wieder online sind, aus der "deaktiviert"-Liste entfernen
+        var onlineIDs = [CGDirectDisplayID](repeating: 0, count: 16)
+        var count: UInt32 = 0
+        CGGetOnlineDisplayList(16, &onlineIDs, &count)
+        let online = Set(Array(onlineIDs[0..<Int(count)]))
+        let stale = disabledIDs.intersection(online)
+        if !stale.isEmpty {
+            disabledIDs.subtract(stale)
+            saveDisabledIDs()
         }
     }
 }

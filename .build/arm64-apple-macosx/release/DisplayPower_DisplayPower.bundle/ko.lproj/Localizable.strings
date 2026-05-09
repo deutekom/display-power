@@ -28,3 +28,5 @@
 "icon_coaxial" = "동축 케이블";
 "icon_plug" = "플러그";
 "icon_plug_filled" = "플러그 (채움)";
+
+"display_off_suffix" = " (꺼짐)";

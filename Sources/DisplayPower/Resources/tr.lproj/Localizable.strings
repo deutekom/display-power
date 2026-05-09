@@ -28,3 +28,5 @@
 "icon_coaxial" = "Koaksiyel kablo";
 "icon_plug" = "Fiş";
 "icon_plug_filled" = "Fiş (dolu)";
+
+"display_off_suffix" = " (kapalı)";

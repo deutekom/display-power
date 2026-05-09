@@ -28,3 +28,5 @@
 "icon_coaxial" = "Koaksialkabel";
 "icon_plug" = "Støpsel";
 "icon_plug_filled" = "Støpsel (fylt)";
+
+"display_off_suffix" = " (av)";

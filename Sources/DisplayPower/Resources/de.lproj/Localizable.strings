@@ -28,3 +28,5 @@
 "icon_coaxial" = "Koaxialkabel";
 "icon_plug" = "Stecker";
 "icon_plug_filled" = "Stecker (gefüllt)";
+
+"display_off_suffix" = " (aus)";

@@ -28,3 +28,5 @@
 "icon_coaxial" = "كابل محوري";
 "icon_plug" = "قابس";
 "icon_plug_filled" = "قابس (ممتلئ)";
+
+"display_off_suffix" = " (مطفأ)";

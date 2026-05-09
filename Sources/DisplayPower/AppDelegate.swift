@@ -107,16 +107,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             for id in externals {
                 let isDisplayLink = DisplayManager.shared.isDisplayLinkDisplay(id)
-                let title = DisplayManager.shared.displayName(id) + (isDisplayLink ? L("usb_suffix") : "")
-                let item  = NSMenuItem(
+                let isEnabled     = DisplayManager.shared.isEnabled(id)
+                let isLast        = DisplayManager.shared.isLastActiveDisplay(id)
+
+                var title = DisplayManager.shared.displayName(id)
+                if isDisplayLink { title += L("usb_suffix") }
+                if !isEnabled    { title += L("display_off_suffix") }
+
+                // Deaktivierter letzter Bildschirm: nur auswählen, nicht umschalten
+                let canToggle = !isDisplayLink && !(isEnabled && isLast)
+                let item = NSMenuItem(
                     title:         title,
-                    action:        isDisplayLink ? nil : #selector(selectDisplay(_:)),
+                    action:        canToggle ? #selector(selectDisplay(_:)) : nil,
                     keyEquivalent: ""
                 )
-                item.target    = isDisplayLink ? nil : self
+                item.target    = canToggle ? self : nil
                 item.tag       = Int(id)
                 item.state     = id == selected ? .on : .off
-                item.isEnabled = !isDisplayLink
+                item.isEnabled = canToggle
                 menu.addItem(item)
             }
         }

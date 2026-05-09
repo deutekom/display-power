@@ -28,3 +28,5 @@
 "icon_coaxial" = "Koaksiaalikaapeli";
 "icon_plug" = "Pistoke";
 "icon_plug_filled" = "Pistoke (täytetty)";
+
+"display_off_suffix" = " (pois)";

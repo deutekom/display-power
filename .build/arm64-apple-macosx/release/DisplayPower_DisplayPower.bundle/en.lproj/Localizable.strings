@@ -28,3 +28,5 @@
 "icon_coaxial" = "Coaxial Cable";
 "icon_plug" = "Plug";
 "icon_plug_filled" = "Plug (Filled)";
+
+"display_off_suffix" = " (off)";

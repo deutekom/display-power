@@ -28,3 +28,5 @@
 "icon_coaxial" = "Coaxiaal kabel";
 "icon_plug" = "Stekker";
 "icon_plug_filled" = "Stekker (gevuld)";
+
+"display_off_suffix" = " (uit)";

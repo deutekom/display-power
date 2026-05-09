@@ -28,3 +28,5 @@
 "icon_coaxial" = "Cabo coaxial";
 "icon_plug" = "Plugue";
 "icon_plug_filled" = "Plugue (preenchido)";
+
+"display_off_suffix" = " (desligado)";

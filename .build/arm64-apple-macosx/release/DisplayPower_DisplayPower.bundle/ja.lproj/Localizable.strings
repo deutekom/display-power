@@ -28,3 +28,5 @@
 "icon_coaxial" = "同軸ケーブル";
 "icon_plug" = "プラグ";
 "icon_plug_filled" = "プラグ（塗りつぶし）";
+
+"display_off_suffix" = "（オフ）";

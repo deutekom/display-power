@@ -28,3 +28,5 @@
 "icon_coaxial" = "Cable coaxial";
 "icon_plug" = "Enchufe";
 "icon_plug_filled" = "Enchufe (relleno)";
+
+"display_off_suffix" = " (apagado)";
