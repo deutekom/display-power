@@ -5,10 +5,11 @@ private let kSelectedDisplayKey = "selectedDisplayID"
 private let kIconStyleKey       = "iconStyle"
 private let kLaunchAgentLabel   = "com.user.displaypower"
 
-// Verfügbare Icon-Stile mit SF-Symbol-Name und Anzeige-Label
-private let kIconStyles: [(symbol: String, label: String)] = [
+// Kandidaten – zur Laufzeit auf Verfügbarkeit geprüft
+private let kIconStyleCandidates: [(symbol: String, label: String)] = [
     ("display",           "Monitor"),
-    ("cable.connector",   "Kabel-Stecker (HDMI)"),
+    ("hdmi",              "HDMI"),
+    ("cable.connector",   "Kabel-Stecker"),
 ]
 
 @MainActor
@@ -18,6 +19,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var statusItem: NSStatusItem!
+
+    // Nur Symbole die auf diesem System tatsächlich existieren
+    private lazy var availableIconStyles: [(symbol: String, label: String)] = {
+        kIconStyleCandidates.filter {
+            NSImage(systemSymbolName: $0.symbol, accessibilityDescription: nil) != nil
+        }
+    }()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         DisplayManager.shared.refreshNameCache()
@@ -115,24 +123,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         optionenMenu.addItem(.separator())
 
-        // Icon-Auswahl
-        let currentSymbol = UserDefaults.standard.string(forKey: kIconStyleKey) ?? kIconStyles[0].symbol
-        for style in kIconStyles {
-            let iconItem = NSMenuItem(
+        // Icon-Untermenü
+        let iconEntry    = NSMenuItem(title: "Icon", action: nil, keyEquivalent: "")
+        let iconMenu     = NSMenu(title: "Icon")
+        iconEntry.submenu = iconMenu
+        let currentSymbol = UserDefaults.standard.string(forKey: kIconStyleKey)
+            ?? availableIconStyles.first?.symbol ?? "display"
+        for style in availableIconStyles {
+            let item = NSMenuItem(
                 title:         style.label,
                 action:        #selector(selectIconStyle(_:)),
                 keyEquivalent: ""
             )
-            iconItem.target         = self
-            iconItem.representedObject = style.symbol
-            iconItem.state          = style.symbol == currentSymbol ? .on : .off
-            // Kleines Vorschau-Icon links neben dem Text
+            item.target            = self
+            item.representedObject = style.symbol
+            item.state             = style.symbol == currentSymbol ? .on : .off
             if let img = NSImage(systemSymbolName: style.symbol, accessibilityDescription: nil) {
-                img.isTemplate   = true
-                iconItem.image   = img
+                img.isTemplate = true
+                item.image     = img
             }
-            optionenMenu.addItem(iconItem)
+            iconMenu.addItem(item)
         }
+        optionenMenu.addItem(iconEntry)
 
         menu.addItem(optionen)
 
@@ -162,7 +174,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusIcon() {
         guard let button = statusItem.button else { return }
 
-        let symbol = UserDefaults.standard.string(forKey: kIconStyleKey) ?? kIconStyles[0].symbol
+        let symbol = UserDefaults.standard.string(forKey: kIconStyleKey)
+            ?? availableIconStyles.first?.symbol ?? "display"
 
         guard let id = resolvedSelectedID() else {
             button.image = NSImage(systemSymbolName: "display.trianglebadge.exclamationmark",
