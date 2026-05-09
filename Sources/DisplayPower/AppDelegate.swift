@@ -37,6 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupPopover() {
         settingsVC = SettingsViewController()
+        // AppDelegate besitzt settingsVC und lebt für die App-Lifetime;
+        // weak self verhindert dennoch theoretische Zyklen bei künftigen Änderungen
         settingsVC.onDisplaySelected = { [weak self] id in
             UserDefaults.standard.set(Int(id), forKey: kSelectedDisplayKey)
             self?.updateStatusIcon()
@@ -64,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DisplayManager.shared.toggle(id)
         // Kurze Verzögerung: CoreGraphics braucht einen Moment für die Konfigurationsänderung
         Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 350_000_000)
+            try await Task.sleep(nanoseconds: 350_000_000)
             self?.updateStatusIcon()
         }
     }
@@ -78,7 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let externals = DisplayManager.shared.externalDisplayIDs()
         let list = externals.map { (id: $0, name: DisplayManager.shared.displayName($0)) }
-        let selected = resolvedSelectedID() ?? externals.first ?? 0
+        let selected = resolvedSelectedID() ?? externals.first ?? kCGNullDirectDisplay
         settingsVC.update(displays: list, selectedID: selected)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
     }
