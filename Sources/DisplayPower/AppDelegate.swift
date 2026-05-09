@@ -10,13 +10,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var statusItem: NSStatusItem!
-    private var popover: NSPopover!
-    private var settingsVC: SettingsViewController!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         DisplayManager.shared.refreshNameCache()
         setupStatusItem()
-        setupPopover()
 
         NotificationCenter.default.addObserver(
             self,
@@ -39,26 +36,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         button.sendAction(on: [.leftMouseUp, .rightMouseDown])
     }
 
-    private func setupPopover() {
-        settingsVC = SettingsViewController()
-        // AppDelegate besitzt settingsVC und lebt für die App-Lifetime;
-        // weak self verhindert dennoch theoretische Zyklen bei künftigen Änderungen
-        settingsVC.onDisplaySelected = { [weak self] id in
-            UserDefaults.standard.set(Int(id), forKey: kSelectedDisplayKey)
-            self?.updateStatusIcon()
-        }
-        popover = NSPopover()
-        popover.contentViewController = settingsVC
-        popover.behavior = .transient
-    }
-
     // MARK: - Klick-Routing
 
     @objc private func handleClick(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
         switch event.type {
         case .rightMouseDown:
-            togglePopover(from: sender)
+            showMenu(from: sender)
         case .leftMouseUp:
             toggleSelectedDisplay()
         default:
@@ -78,18 +62,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Popover
+    // MARK: - Menü
 
-    private func togglePopover(from button: NSStatusBarButton) {
-        if popover.isShown {
-            popover.performClose(nil)
-            return
-        }
+    private func showMenu(from button: NSStatusBarButton) {
+        let menu = NSMenu()
+
         let externals = DisplayManager.shared.externalDisplayIDs()
-        let list = externals.map { (id: $0, name: DisplayManager.shared.displayName($0)) }
-        let selected = resolvedSelectedID() ?? externals.first ?? kCGNullDirectDisplay
-        settingsVC.update(displays: list, selectedID: selected)
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        let selected = resolvedSelectedID()
+
+        if externals.isEmpty {
+            let item = NSMenuItem(title: "Kein externer Bildschirm", action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            menu.addItem(item)
+        } else {
+            for id in externals {
+                let item = NSMenuItem(
+                    title: DisplayManager.shared.displayName(id),
+                    action: #selector(selectDisplay(_:)),
+                    keyEquivalent: ""
+                )
+                item.target = self
+                item.tag = Int(id)
+                item.state = id == selected ? .on : .off
+                menu.addItem(item)
+            }
+        }
+
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Beenden", action: #selector(NSApp.terminate(_:)), keyEquivalent: "q"))
+
+        // Menü direkt unter dem Icon anzeigen
+        statusItem.menu = menu
+        button.performClick(nil)
+        statusItem.menu = nil
+    }
+
+    @objc private func selectDisplay(_ sender: NSMenuItem) {
+        let id = CGDirectDisplayID(sender.tag)
+        UserDefaults.standard.set(Int(id), forKey: kSelectedDisplayKey)
+        updateStatusIcon()
     }
 
     // MARK: - Icon
