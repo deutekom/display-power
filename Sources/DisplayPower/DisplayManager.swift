@@ -56,6 +56,8 @@ final class DisplayManager {
                 return screen.localizedName
             }
         }
+        // Gespiegelte/deaktivierte Displays erscheinen nicht in NSScreen.screens
+        // → Cache liefert den zuletzt bekannten Namen
         return nameCache[id] ?? "Bildschirm \(id)"
     }
 

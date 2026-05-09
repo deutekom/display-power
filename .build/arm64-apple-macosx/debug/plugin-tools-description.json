@@ -1,0 +1,270 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.DisplayPower-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/sources",
+      "importPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "DisplayPower",
+      "moduleOutputPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules/DisplayPower.swiftmodule",
+      "objects" : [
+        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o",
+        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx12.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "DisplayPower_main",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "display_power"
+      ],
+      "outputFileMapPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules/DisplayPower.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift",
+        "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift"
+      ],
+      "tempsPath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "DisplayPower" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DisplayPower",
+      "-package-name",
+      "display_power",
+      "-c",
+      "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift",
+      "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift",
+      "-I",
+      "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx12.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "DisplayPower_main",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "display_power",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "DisplayPower" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower-entitlement.plist"
+    },
+    "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/DisplayManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/Sources/DisplayPower/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/sources"
+    },
+    "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/DisplayManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.build/main.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/DisplayPower.product/Objects.LinkFileList"
+    },
+    "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/deutekom/claude-code/display-power/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}
