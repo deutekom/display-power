@@ -105,17 +105,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(item)
         } else {
             for id in externals {
-                let native = DisplayManager.shared.isNativeDisplay(id)
-                let title  = DisplayManager.shared.displayName(id) + (native ? "" : " (USB)")
-                let item   = NSMenuItem(
+                let isDisplayLink = DisplayManager.shared.isDisplayLinkDisplay(id)
+                let title = DisplayManager.shared.displayName(id) + (isDisplayLink ? " (USB)" : "")
+                let item  = NSMenuItem(
                     title:         title,
-                    action:        native ? #selector(selectDisplay(_:)) : nil,
+                    action:        isDisplayLink ? nil : #selector(selectDisplay(_:)),
                     keyEquivalent: ""
                 )
-                item.target    = native ? self : nil
+                item.target    = isDisplayLink ? nil : self
                 item.tag       = Int(id)
                 item.state     = id == selected ? .on : .off
-                item.isEnabled = native
+                item.isEnabled = !isDisplayLink
                 menu.addItem(item)
             }
         }
@@ -263,11 +263,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Hilfsmethoden
 
-    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen und nativ (HDMI/DP).
-    // Fällt auf das erste verfügbare native Display zurück.
+    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen und kein DisplayLink.
+    // Fällt auf das erste verfügbare nicht-DisplayLink-Display zurück.
     private func resolvedSelectedID() -> CGDirectDisplayID? {
         let natives = DisplayManager.shared.externalDisplayIDs()
-            .filter { DisplayManager.shared.isNativeDisplay($0) }
+            .filter { !DisplayManager.shared.isDisplayLinkDisplay($0) }
         guard !natives.isEmpty else { return nil }
 
         let stored = CGDirectDisplayID(UInt32(UserDefaults.standard.integer(forKey: kSelectedDisplayKey)))
