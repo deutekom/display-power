@@ -56,10 +56,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func handleClick(_ sender: NSStatusBarButton) {
         guard let event = NSApp.currentEvent else { return }
-        if event.type == .rightMouseDown {
+        switch event.type {
+        case .rightMouseDown:
             togglePopover(from: sender)
-        } else {
+        case .leftMouseUp:
             toggleSelectedDisplay()
+        default:
+            break
         }
     }
 
