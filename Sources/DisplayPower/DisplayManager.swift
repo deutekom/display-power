@@ -97,8 +97,8 @@ final class DisplayManager {
     func promoteToMain(_ newMainID: CGDirectDisplayID) -> Bool {
         guard newMainID != CGMainDisplayID() else { return true }
         let target = CGDisplayBounds(newMainID)
-        let dx = Int32(-target.origin.x)
-        let dy = Int32(-target.origin.y)
+        let dxF = -target.origin.x
+        let dyF = -target.origin.y
 
         var ids = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
@@ -108,7 +108,9 @@ final class DisplayManager {
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return false }
         for id in ids[0..<Int(count)] {
             let b = CGDisplayBounds(id)
-            CGConfigureDisplayOrigin(config, id, Int32(b.origin.x) + dx, Int32(b.origin.y) + dy)
+            CGConfigureDisplayOrigin(config, id,
+                Int32((b.origin.x + dxF).rounded()),
+                Int32((b.origin.y + dyF).rounded()))
         }
         return CGCompleteDisplayConfiguration(config, .forSession) == .success
     }
