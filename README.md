@@ -35,7 +35,7 @@ Displays, die über **USB-C/Thunderbolt** oder **DisplayLink**-Adapter angeschlo
 
 ## Installation
 
-1. [`DisplayPower-v1.0.0.dmg`](https://github.com/deutekom/display-power/releases/latest) herunterladen
+1. [`DisplayPower-v1.0.2.dmg`](https://github.com/deutekom/display-power/releases/latest) herunterladen
 2. DMG öffnen und `DisplayPower.app` in den Programme-Ordner ziehen
 
 > **Gatekeeper-Hinweis:** Da die App nicht mit einem kostenpflichtigen Apple Developer-Zertifikat signiert ist, blockiert macOS den Start.
