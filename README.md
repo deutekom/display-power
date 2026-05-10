@@ -1,16 +1,27 @@
 # DisplayPower
 
-Schlanke macOS-Menüleisten-App, die externe Monitore für macOS gezielt „unsichtbar" macht – per Klick.
+Schlanke macOS-Menüleisten-App, die externe HDMI-Monitore für macOS gezielt „unsichtbar" macht – per Klick.
 
-## Wofür ist das nützlich?
+## Das Problem
 
-Viele HDMI-Monitore bleiben für macOS dauerhaft als aktives Display sichtbar, auch wenn der Bildschirm physisch ausgeschaltet ist oder auf einen anderen Eingang umgeschaltet wurde. macOS bemerkt das nicht und behandelt den Monitor weiterhin als eingeschaltet:
+Das Kabel steckt noch drin – und das reicht macOS, um den Monitor als aktiv zu behandeln.
 
-- Fenster und Apps werden auf den „ausgeschalteten" Monitor verschoben
-- Die Auflösung oder Anordnung der Desktops verändert sich
-- Der Bildschirmschoner oder Ruhezustand greift nicht korrekt
+Wer einen HDMI-Monitor an den Mac anschließt und ihn später ausschaltet oder auf einen anderen Eingang umschaltet, erlebt das klassische Problem: macOS bemerkt die physische Änderung nicht. Solange das HDMI-Kabel steckt, gilt der Monitor für das Betriebssystem als verbunden und aktiv – egal was auf dem Bildschirm zu sehen ist.
 
-DisplayPower löst das, indem es macOS per CoreGraphics-Mirroring mitteilt, dass der Monitor nicht mehr aktiv ist – unabhängig davon, was der Monitor physisch meldet.
+Die Folgen:
+
+- Fenster und Apps wandern auf den „ausgeschalteten" Monitor und sind scheinbar verschwunden
+- Die Desktop-Anordnung verändert sich, Spaces verschieben sich
+- Der Bildschirmschoner oder Energiesparmodus greift möglicherweise nicht wie erwartet, weil macOS einen aktiven zweiten Bildschirm annimmt
+- Das Kabel abziehen ist oft keine Option – etwa bei fest installierten Setups oder wenn der Monitor per KVM zwischen mehreren Geräten wechselt
+
+## Die Lösung
+
+DisplayPower nutzt einen gezielten Trick: Statt den Monitor zu „deaktivieren" (was macOS über öffentliche APIs gar nicht erlaubt), wird er als **Spiegel des Hauptbildschirms** konfiguriert.
+
+Das Ergebnis: macOS behandelt den HDMI-Monitor nicht mehr als eigenständige Arbeitsfläche. Alle Fenster, Spaces und Apps bleiben auf dem Hauptbildschirm – der externe Monitor existiert für macOS zwar noch, belegt aber keinen eigenen Desktop-Bereich mehr. Der Bildschirmschoner und der Energiesparmodus orientieren sich wieder am Hauptbildschirm.
+
+Das Kabel kann weiterhin stecken bleiben.
 
 ## Funktionsweise
 
@@ -18,7 +29,7 @@ DisplayPower löst das, indem es macOS per CoreGraphics-Mirroring mitteilt, dass
 - **Rechtsklick** öffnet das Einstellungsmenü
 - Optional: **Linksklick öffnet Menü** (mehrere Monitore direkt togglen)
 
-Das Aus- und Einschalten erfolgt über `CGConfigureDisplayMirrorOfDisplay` – ausschließlich öffentliche APIs, keine privaten Frameworks.
+Das Ein- und Ausschalten erfolgt über `CGConfigureDisplayMirrorOfDisplay` – ausschließlich öffentliche APIs, keine privaten Frameworks.
 
 ## Features
 
