@@ -45,6 +45,14 @@ Displays, die über **USB-C/Thunderbolt** oder **DisplayLink**-Adapter angeschlo
 > **Ältere macOS-Versionen:** **Rechtsklick → Öffnen → Öffnen** bestätigen.
 >
 > Danach startet die App normal.
+>
+> **Nach einem Update fehlt der Hinweis in Datenschutz & Sicherheit?** Das kann passieren, wenn macOS das Quarantäne-Attribut nach einer Neuinstallation nicht erneut anzeigt. Abhilfe per Terminal:
+>
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/DisplayPower.app
+> ```
+>
+> Danach lässt sich die App direkt starten.
 
 ## Voraussetzungen
 
