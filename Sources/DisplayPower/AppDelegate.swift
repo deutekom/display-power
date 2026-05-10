@@ -117,7 +117,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 let isOn      = supported && DisplayManager.shared.isEnabled(id)
                 var title     = DisplayManager.shared.displayName(id)
                 if !supported {
-                    title += L("usb_suffix")
+                    title += " (USB-C)"
                 } else if !isMenuClickMode && !isOn {
                     title += L("display_off_suffix")
                 }
