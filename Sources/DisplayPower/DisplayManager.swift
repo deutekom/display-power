@@ -31,7 +31,9 @@ final class DisplayManager {
     func disable(_ id: CGDirectDisplayID) {
         if id == CGMainDisplayID() {
             guard promoteAlternativeToMain(excluding: id) else { return }
-            UserDefaults.standard.set(Int(id), forKey: Self.kPreviousMainKey)
+            if UserDefaults.standard.object(forKey: Self.kPreviousMainKey) == nil {
+                UserDefaults.standard.set(Int(id), forKey: Self.kPreviousMainKey)
+            }
         }
         let main = CGMainDisplayID()
         var config: CGDisplayConfigRef?
@@ -48,12 +50,13 @@ final class DisplayManager {
         CGConfigureDisplayMirrorOfDisplay(config, id, kCGNullDirectDisplay)
         CGCompleteDisplayConfiguration(config, .forSession)
 
+        guard UserDefaults.standard.object(forKey: Self.kPreviousMainKey) != nil else { return }
         let stored = CGDirectDisplayID(UInt32(
             UserDefaults.standard.integer(forKey: Self.kPreviousMainKey)
         ))
         guard stored == id else { return }
         UserDefaults.standard.removeObject(forKey: Self.kPreviousMainKey)
-        Task { @MainActor [self] in
+        Task { @MainActor in
             try? await Task.sleep(nanoseconds: 500_000_000)
             promoteToMain(id)
         }
