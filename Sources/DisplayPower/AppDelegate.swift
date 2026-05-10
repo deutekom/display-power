@@ -74,7 +74,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .rightMouseDown:
             showMenu(from: sender)
         case .leftMouseUp:
-            toggleSelectedDisplay()
+            if UserDefaults.standard.bool(forKey: kMenuClickModeKey) {
+                showMenu(from: sender)
+            } else {
+                toggleSelectedDisplay()
+            }
         default:
             break
         }
