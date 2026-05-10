@@ -1,3 +1,7 @@
 .build/
 *.o
 *.d
+*.dmg
+.claude/settings.local.json
+.claude/worktrees/
+docs/superpowers/
