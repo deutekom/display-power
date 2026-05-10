@@ -113,11 +113,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let isMenuClickMode = UserDefaults.standard.bool(forKey: kMenuClickModeKey)
 
             for id in externals {
-                let supported = DisplayManager.shared.isSupported(id)
+                let reason    = DisplayManager.shared.unsupportedReason(id)
+                let supported = reason == nil
                 let isOn      = supported && DisplayManager.shared.isEnabled(id)
                 var title     = DisplayManager.shared.displayName(id)
-                if !supported {
-                    title += " (USB-C)"
+                if let r = reason {
+                    switch r {
+                    case .usbc:        title += L("usbc_suffix")
+                    case .displayPort: title += L("displayport_suffix")
+                    }
                 } else if !isMenuClickMode && !isOn {
                     title += L("display_off_suffix")
                 }
