@@ -27,10 +27,13 @@ final class DisplayManager {
     }
 
     // Display "ausschalten": als Spiegel des Hauptdisplays konfigurieren.
-    // Fenster wandern automatisch auf andere Displays.
+    // Wenn id der Hauptmonitor ist, wird zuerst ein anderer Display zum Hauptmonitor befördert.
     func disable(_ id: CGDirectDisplayID) {
+        if id == CGMainDisplayID() {
+            guard promoteAlternativeToMain(excluding: id) else { return }
+            UserDefaults.standard.set(Int(id), forKey: Self.kPreviousMainKey)
+        }
         let main = CGMainDisplayID()
-        guard id != main else { return }
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
         CGConfigureDisplayMirrorOfDisplay(config, id, main)
@@ -38,11 +41,22 @@ final class DisplayManager {
     }
 
     // Display "einschalten": Spiegelung aufheben.
+    // War dieses Display vorher der Hauptmonitor, wird es nach 500 ms wiederhergestellt.
     func enable(_ id: CGDirectDisplayID) {
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
         CGConfigureDisplayMirrorOfDisplay(config, id, kCGNullDirectDisplay)
         CGCompleteDisplayConfiguration(config, .forSession)
+
+        let stored = CGDirectDisplayID(UInt32(
+            UserDefaults.standard.integer(forKey: Self.kPreviousMainKey)
+        ))
+        guard stored == id else { return }
+        UserDefaults.standard.removeObject(forKey: Self.kPreviousMainKey)
+        Task { @MainActor [self] in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            promoteToMain(id)
+        }
     }
 
     func toggle(_ id: CGDirectDisplayID) {
