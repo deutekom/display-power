@@ -30,3 +30,5 @@
 "icon_plug_filled" = "قابس (ممتلئ)";
 
 "display_off_suffix" = " (مطفأ)";
+
+"left_click_opens_menu" = "النقر يفتح القائمة";

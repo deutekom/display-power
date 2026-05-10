@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Spina (piena)";
 
 "display_off_suffix" = " (spento)";
+
+"left_click_opens_menu" = "Clic apre il menu";

@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Stekker (gevuld)";
 
 "display_off_suffix" = " (uit)";
+
+"left_click_opens_menu" = "Klik opent menu";

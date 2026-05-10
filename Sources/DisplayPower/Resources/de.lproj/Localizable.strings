@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Stecker (gefüllt)";
 
 "display_off_suffix" = " (aus)";
+
+"left_click_opens_menu" = "Linksklick öffnet Menü";

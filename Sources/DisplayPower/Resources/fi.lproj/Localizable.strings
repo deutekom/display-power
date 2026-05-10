@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Pistoke (täytetty)";
 
 "display_off_suffix" = " (pois)";
+
+"left_click_opens_menu" = "Napsautus avaa valikon";

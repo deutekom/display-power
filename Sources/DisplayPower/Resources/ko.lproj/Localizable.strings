@@ -30,3 +30,5 @@
 "icon_plug_filled" = "플러그 (채움)";
 
 "display_off_suffix" = " (꺼짐)";
+
+"left_click_opens_menu" = "클릭하면 메뉴 열기";

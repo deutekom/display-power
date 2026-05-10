@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Штекер (заполненный)";
 
 "display_off_suffix" = " (выкл.)";
+
+"left_click_opens_menu" = "Клик открывает меню";

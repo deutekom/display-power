@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Stik (fyldt)";
 
 "display_off_suffix" = " (slukket)";
+
+"left_click_opens_menu" = "Klik åbner menuen";

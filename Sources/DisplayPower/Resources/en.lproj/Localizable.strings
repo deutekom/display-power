@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Plug (Filled)";
 
 "display_off_suffix" = " (off)";
+
+"left_click_opens_menu" = "Click opens menu";

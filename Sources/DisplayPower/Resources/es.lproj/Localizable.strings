@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Enchufe (relleno)";
 
 "display_off_suffix" = " (apagado)";
+
+"left_click_opens_menu" = "Clic abre el menú";

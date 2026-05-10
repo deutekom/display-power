@@ -30,3 +30,5 @@
 "icon_plug_filled" = "Prise (plein)";
 
 "display_off_suffix" = " (éteint)";
+
+"left_click_opens_menu" = "Clic ouvre le menu";
