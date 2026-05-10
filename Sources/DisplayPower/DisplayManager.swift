@@ -56,46 +56,67 @@ final class DisplayManager {
     private func isSupportedDisplay(_ id: CGDirectDisplayID) -> Bool {
         let vendor  = CGDisplayVendorNumber(id)
         let product = CGDisplayModelNumber(id)
-        let serial  = CGDisplaySerialNumber(id)
 
-        guard let baseMatch = IOServiceMatching("IODisplayConnect") else { return true }
-        let matchDict = baseMatch as NSMutableDictionary
-        matchDict["DisplayVendorID"]  = NSNumber(value: vendor)
-        matchDict["DisplayProductID"] = NSNumber(value: product)
-        if serial != 0 {
-            matchDict["DisplaySerialNumber"] = NSNumber(value: serial)
-        }
+        // DisplayLink-USB-Adapter direkt ausschließen
+        if vendor == 0x17E9 { return false }
 
+        // macOS 16+: AppleATCDPAltModePort für USB-C/DP-Alt-Mode-Displays
+        if isATCDPDisplay(vendor: vendor, product: product) { return false }
+
+        // Legacy (macOS < 16): IODisplayConnect mit Thunderbolt-Eltern-Suche
+        return !isThunderboltViaLegacyIOKit(vendor: vendor, product: product)
+    }
+
+    // macOS 16+: Sucht in AppleATCDPAltModePort nach einem Display anhand
+    // der EDID UUID (Format: VVVVPPPP-... mit big-endian product bytes).
+    private func isATCDPDisplay(vendor: UInt32, product: UInt32) -> Bool {
+        // EDID UUID beginnt mit Vendor (4 hex) + CFSwapInt16(product) (4 hex)
+        let vendorHex  = String(format: "%04X", vendor)
+        let productBE  = CFSwapInt16(UInt16(product & 0xFFFF))
+        let productHex = String(format: "%04X", productBE)
+        let uuidPrefix = vendorHex + productHex
+
+        guard let matching = IOServiceMatching("AppleATCDPAltModePort") else { return false }
         var iter: io_iterator_t = 0
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, matchDict, &iter) == KERN_SUCCESS else {
-            return true
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter) == KERN_SUCCESS else {
+            return false
         }
         defer { IOObjectRelease(iter) }
 
         var service = IOIteratorNext(iter)
         while service != IO_OBJECT_NULL {
             defer { IOObjectRelease(service); service = IOIteratorNext(iter) }
-
-            // DisplayLink-USB-Adapter: Synaptics Vendor-ID 0x17E9
-            if let v = IORegistryEntrySearchCFProperty(
-                service, kIOServicePlane, "idVendor" as CFString,
-                kCFAllocatorDefault,
-                IOOptionBits(kIORegistryIterateParents | kIORegistryIterateRecursively)
-            ) as? NSNumber, v.uint32Value == 0x17E9 {
-                return false
-            }
-
-            // USB-C/Thunderbolt: Thunderbolt-Controller im IOKit-Pfad vorhanden
-            if hasThunderboltAncestor(service) {
-                return false
-            }
+            guard let hints = IORegistryEntryCreateCFProperty(
+                service, "DisplayHints" as CFString, kCFAllocatorDefault, 0
+            )?.takeRetainedValue() as? [String: Any],
+            let edidUUID = hints["EDID UUID"] as? String else { continue }
+            if edidUUID.hasPrefix(uuidPrefix) { return true }
         }
-        return true
+        return false
     }
 
-    // Traversiert den IOKit-Service-Baum nach oben und sucht nach einem
-    // Thunderbolt-Controller (AppleThunderboltNHI*). Auf Apple Silicon laufen
-    // alle USB-C-Ports über den Thunderbolt-Controller, auch DP-Alt-Mode.
+    // Legacy für macOS < 16: IODisplayConnect mit Thunderbolt-Vorfahren-Suche.
+    private func isThunderboltViaLegacyIOKit(vendor: UInt32, product: UInt32) -> Bool {
+        guard let baseMatch = IOServiceMatching("IODisplayConnect") else { return false }
+        let matchDict = baseMatch as NSMutableDictionary
+        matchDict["DisplayVendorID"]  = NSNumber(value: vendor)
+        matchDict["DisplayProductID"] = NSNumber(value: product)
+
+        var iter: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matchDict, &iter) == KERN_SUCCESS else {
+            return false
+        }
+        defer { IOObjectRelease(iter) }
+
+        var service = IOIteratorNext(iter)
+        while service != IO_OBJECT_NULL {
+            defer { IOObjectRelease(service); service = IOIteratorNext(iter) }
+            if hasThunderboltAncestor(service) { return true }
+        }
+        return false
+    }
+
+    // Traversiert den IOKit-Service-Baum nach oben und sucht nach einem Thunderbolt-Controller.
     private func hasThunderboltAncestor(_ service: io_object_t) -> Bool {
         var current: io_object_t = service
         IOObjectRetain(current)
