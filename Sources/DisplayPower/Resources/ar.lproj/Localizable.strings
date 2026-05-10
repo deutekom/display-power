@@ -32,3 +32,6 @@
 "display_off_suffix" = " (مطفأ)";
 
 "left_click_opens_menu" = "النقر يفتح القائمة";
+
+"usbc_suffix" = " (USB-C)";
+"displayport_suffix" = " (DisplayPort)";

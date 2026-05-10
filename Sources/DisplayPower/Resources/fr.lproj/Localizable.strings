@@ -32,3 +32,6 @@
 "display_off_suffix" = " (éteint)";
 
 "left_click_opens_menu" = "Clic ouvre le menu";
+
+"usbc_suffix" = " (USB-C)";
+"displayport_suffix" = " (DisplayPort)";

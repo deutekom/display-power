@@ -32,3 +32,6 @@
 "display_off_suffix" = " (pois)";
 
 "left_click_opens_menu" = "Napsautus avaa valikon";
+
+"usbc_suffix" = " (USB-C)";
+"displayport_suffix" = " (DisplayPort)";

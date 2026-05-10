@@ -32,3 +32,6 @@
 "display_off_suffix" = "（オフ）";
 
 "left_click_opens_menu" = "クリックでメニューを開く";
+
+"usbc_suffix" = " (USB-C)";
+"displayport_suffix" = " (DisplayPort)";

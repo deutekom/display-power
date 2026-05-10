@@ -32,3 +32,6 @@
 "display_off_suffix" = "（關閉）";
 
 "left_click_opens_menu" = "點擊開啟選單";
+
+"usbc_suffix" = " (USB-C)";
+"displayport_suffix" = " (DisplayPort)";
