@@ -3,6 +3,7 @@ import CoreGraphics
 
 private let kSelectedDisplayKey = "selectedDisplayID"
 private let kIconStyleKey       = "iconStyle"
+private let kMenuClickModeKey   = "menuClickMode"
 private let kLaunchAgentLabel   = "com.user.displaypower"
 
 // Kandidaten – zur Laufzeit auf Verfügbarkeit geprüft.
@@ -143,6 +144,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         autoItem.state  = isAutoStartEnabled() ? .on : .off
         optionenMenu.addItem(autoItem)
 
+        let menuClickItem = NSMenuItem(
+            title:         L("left_click_opens_menu"),
+            action:        #selector(toggleMenuClickMode(_:)),
+            keyEquivalent: ""
+        )
+        menuClickItem.target = self
+        menuClickItem.state  = UserDefaults.standard.bool(forKey: kMenuClickModeKey) ? .on : .off
+        optionenMenu.addItem(menuClickItem)
+
         optionenMenu.addItem(.separator())
 
         // Icon-Untermenü
@@ -232,6 +242,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             enableAutoStart()
         }
+    }
+
+    @objc private func toggleMenuClickMode(_ sender: NSMenuItem) {
+        let current = UserDefaults.standard.bool(forKey: kMenuClickModeKey)
+        UserDefaults.standard.set(!current, forKey: kMenuClickModeKey)
     }
 
     private func enableAutoStart() {
