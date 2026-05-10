@@ -20,12 +20,6 @@ final class DisplayManager {
         return Array(ids[0..<Int(count)]).filter { CGDisplayIsBuiltin($0) == 0 }
     }
 
-    // True = Display ist via CGConfigureDisplayMirrorOfDisplay steuerbar.
-    // False für DisplayLink-Adapter (0x17E9) und USB-C/Thunderbolt-Displays.
-    func isSupported(_ id: CGDirectDisplayID) -> Bool {
-        isSupportedDisplay(id)
-    }
-
     // True = Display ist aktiv (nicht gespiegelt)
     func isEnabled(_ id: CGDirectDisplayID) -> Bool {
         CGDisplayMirrorsDisplay(id) == kCGNullDirectDisplay
@@ -54,20 +48,34 @@ final class DisplayManager {
         isEnabled(id) ? disable(id) : enable(id)
     }
 
+    enum UnsupportedReason {
+        case usbc
+        case displayPort
+    }
+
     // True = Display kann via CGConfigureDisplayMirrorOfDisplay gesteuert werden.
     // Unsupportet sind: DisplayLink-USB-Adapter (0x17E9) und USB-C/Thunderbolt-Displays.
-    private func isSupportedDisplay(_ id: CGDirectDisplayID) -> Bool {
+    private func unsupportedReasonFor(_ id: CGDirectDisplayID) -> UnsupportedReason? {
         let vendor  = CGDisplayVendorNumber(id)
         let product = CGDisplayModelNumber(id)
 
         // DisplayLink-USB-Adapter direkt ausschließen
-        if vendor == 0x17E9 { return false }
+        if vendor == 0x17E9 { return .usbc }
 
         // macOS 16+: AppleATCDPAltModePort für USB-C/DP-Alt-Mode-Displays
-        if isATCDPDisplay(vendor: vendor, product: product) { return false }
+        if isATCDPDisplay(vendor: vendor, product: product) { return .usbc }
 
         // Legacy (macOS < 16): IODisplayConnect mit Thunderbolt-Eltern-Suche
-        return !isThunderboltViaLegacyIOKit(vendor: vendor, product: product)
+        if isThunderboltViaLegacyIOKit(vendor: vendor, product: product) { return .usbc }
+        return nil
+    }
+
+    func unsupportedReason(_ id: CGDirectDisplayID) -> UnsupportedReason? {
+        unsupportedReasonFor(id)
+    }
+
+    func isSupported(_ id: CGDirectDisplayID) -> Bool {
+        unsupportedReason(id) == nil
     }
 
     // macOS 16+: Sucht in AppleATCDPAltModePort nach einem Display anhand
