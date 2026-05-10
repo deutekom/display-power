@@ -38,7 +38,13 @@ Displays, die über **USB-C/Thunderbolt** oder **DisplayLink**-Adapter angeschlo
 1. [`DisplayPower-v1.0.0.dmg`](https://github.com/deutekom/display-power/releases/latest) herunterladen
 2. DMG öffnen und `DisplayPower.app` in den Programme-Ordner ziehen
 
-> **Gatekeeper-Hinweis:** Da die App nicht mit einem kostenpflichtigen Apple Developer-Zertifikat signiert ist, erscheint beim ersten Start eine Warnung. Einmaliger Bypass: **Rechtsklick → Öffnen → Öffnen** bestätigen. Danach startet die App normal.
+> **Gatekeeper-Hinweis:** Da die App nicht mit einem kostenpflichtigen Apple Developer-Zertifikat signiert ist, blockiert macOS den Start.
+>
+> **macOS Tahoe (15/16) und neuer:** Nach dem ersten Startversuch unter **Systemeinstellungen → Datenschutz & Sicherheit** nach unten scrollen – dort erscheint ein Hinweis mit der Option „Trotzdem öffnen".
+>
+> **Ältere macOS-Versionen:** **Rechtsklick → Öffnen → Öffnen** bestätigen.
+>
+> Danach startet die App normal.
 
 ## Voraussetzungen
 
