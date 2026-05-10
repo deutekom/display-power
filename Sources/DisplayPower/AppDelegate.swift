@@ -100,6 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showMenu(from button: NSStatusBarButton) {
         let menu = NSMenu()
+        menu.autoenablesItems = false
 
         // Monitor-Auswahl
         let externals = DisplayManager.shared.externalDisplayIDs()

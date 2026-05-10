@@ -65,6 +65,9 @@ final class DisplayManager {
         // macOS 16+: AppleATCDPAltModePort für USB-C/DP-Alt-Mode-Displays
         if isATCDPDisplay(vendor: vendor, product: product) { return .usbc }
 
+        // macOS 16+: AppleATCDPHDMIPort für HDMI-Displays an Apple-Silicon-Macs
+        if isHDMIDisplay(vendor: vendor, product: product) { return .displayPort }
+
         // Legacy (macOS < 16): IODisplayConnect mit Thunderbolt-Eltern-Suche
         if isThunderboltViaLegacyIOKit(vendor: vendor, product: product) { return .usbc }
         return nil
@@ -88,6 +91,32 @@ final class DisplayManager {
         let uuidPrefix = vendorHex + productHex
 
         guard let matching = IOServiceMatching("AppleATCDPAltModePort") else { return false }
+        var iter: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter) == KERN_SUCCESS else {
+            return false
+        }
+        defer { IOObjectRelease(iter) }
+
+        var service = IOIteratorNext(iter)
+        while service != IO_OBJECT_NULL {
+            defer { IOObjectRelease(service); service = IOIteratorNext(iter) }
+            guard let hints = IORegistryEntryCreateCFProperty(
+                service, "DisplayHints" as CFString, kCFAllocatorDefault, 0
+            )?.takeRetainedValue() as? [String: Any],
+            let edidUUID = hints["EDID UUID"] as? String else { continue }
+            if edidUUID.hasPrefix(uuidPrefix) { return true }
+        }
+        return false
+    }
+
+    // macOS 16+: Sucht in AppleATCDPHDMIPort nach einem Display anhand der EDID UUID.
+    private func isHDMIDisplay(vendor: UInt32, product: UInt32) -> Bool {
+        let vendorHex  = String(format: "%04X", vendor)
+        let productBE  = CFSwapInt16(UInt16(product & 0xFFFF))
+        let productHex = String(format: "%04X", productBE)
+        let uuidPrefix = vendorHex + productHex
+
+        guard let matching = IOServiceMatching("AppleATCDPHDMIPort") else { return false }
         var iter: io_iterator_t = 0
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter) == KERN_SUCCESS else {
             return false
