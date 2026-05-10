@@ -110,24 +110,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             item.isEnabled = false
             menu.addItem(item)
         } else {
+            let isMenuClickMode = UserDefaults.standard.bool(forKey: kMenuClickModeKey)
+
             for id in externals {
                 let supported = DisplayManager.shared.isSupported(id)
                 let isOn      = supported && DisplayManager.shared.isEnabled(id)
                 var title     = DisplayManager.shared.displayName(id)
                 if !supported {
-                    title += " (USB-C)"
-                } else if !isOn {
+                    title += L("usb_suffix")
+                } else if !isMenuClickMode && !isOn {
                     title += L("display_off_suffix")
                 }
+
+                let action: Selector? = supported
+                    ? (isMenuClickMode ? #selector(toggleDisplay(_:)) : #selector(selectDisplay(_:)))
+                    : nil
                 let item = NSMenuItem(
                     title:         title,
-                    action:        supported ? #selector(selectDisplay(_:)) : nil,
+                    action:        action,
                     keyEquivalent: ""
                 )
-                item.target     = supported ? self : nil
-                item.tag        = Int(id)
-                item.state      = (supported && id == selected) ? .on : .off
-                item.isEnabled  = supported
+                item.target    = supported ? self : nil
+                item.tag       = Int(id)
+                item.isEnabled = supported
+
+                if isMenuClickMode {
+                    item.state = isOn ? .on : .off
+                } else {
+                    item.state = (supported && id == selected) ? .on : .off
+                }
+
                 menu.addItem(item)
             }
         }
@@ -197,6 +209,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func selectDisplay(_ sender: NSMenuItem) {
         UserDefaults.standard.set(sender.tag, forKey: kSelectedDisplayKey)
         updateStatusIcon()
+    }
+
+    @objc private func toggleDisplay(_ sender: NSMenuItem) {
+        let id = CGDirectDisplayID(UInt32(sender.tag))
+        DisplayManager.shared.toggle(id)
+        Task { @MainActor [weak self] in
+            try await Task.sleep(nanoseconds: 350_000_000)
+            self?.updateStatusIcon()
+        }
     }
 
     @objc private func selectIconStyle(_ sender: NSMenuItem) {
