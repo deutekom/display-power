@@ -33,6 +33,13 @@ Das Aus- und Einschalten erfolgt über `CGConfigureDisplayMirrorOfDisplay` – a
 
 Displays, die über **USB-C/Thunderbolt** oder **DisplayLink**-Adapter angeschlossen sind, lassen sich nicht über die öffentliche CoreGraphics-API steuern. Sie erscheinen ausgegraut im Menü mit dem entsprechenden Verbindungstyp als Hinweis.
 
+## Installation
+
+1. [`DisplayPower-v1.0.0.dmg`](https://github.com/deutekom/display-power/releases/latest) herunterladen
+2. DMG öffnen und `DisplayPower.app` in den Programme-Ordner ziehen
+
+> **Gatekeeper-Hinweis:** Da die App nicht mit einem kostenpflichtigen Apple Developer-Zertifikat signiert ist, erscheint beim ersten Start eine Warnung. Einmaliger Bypass: **Rechtsklick → Öffnen → Öffnen** bestätigen. Danach startet die App normal.
+
 ## Voraussetzungen
 
 - macOS 12 oder neuer
