@@ -99,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Menü
 
     private func showMenu(from button: NSStatusBarButton) {
+        DisplayManager.shared.refreshNameCache()
         let menu = NSMenu()
         menu.autoenablesItems = false
 
@@ -134,7 +135,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     case .usbc:        title += L("usbc_suffix")
                     case .displayPort: title += L("displayport_suffix")
                     }
-                } else if isMain && isOn && !canToggleOff {
+                } else if isMain && isOn {
                     title += L("primary_suffix")
                 } else if !isMenuClickMode && !isOn {
                     title += L("display_off_suffix")
