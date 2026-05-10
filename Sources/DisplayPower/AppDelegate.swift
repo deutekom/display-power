@@ -106,16 +106,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(item)
         } else {
             for id in externals {
-                let isEnabled = DisplayManager.shared.isEnabled(id)
-                let title     = DisplayManager.shared.displayName(id) + (isEnabled ? "" : L("display_off_suffix"))
-                let item      = NSMenuItem(
+                let supported = DisplayManager.shared.isSupported(id)
+                let isOn      = supported && DisplayManager.shared.isEnabled(id)
+                var title     = DisplayManager.shared.displayName(id)
+                if !supported {
+                    title += " (USB-C)"
+                } else if !isOn {
+                    title += L("display_off_suffix")
+                }
+                let item = NSMenuItem(
                     title:         title,
-                    action:        #selector(selectDisplay(_:)),
+                    action:        supported ? #selector(selectDisplay(_:)) : nil,
                     keyEquivalent: ""
                 )
-                item.target = self
-                item.tag    = Int(id)
-                item.state  = id == selected ? .on : .off
+                item.target     = supported ? self : nil
+                item.tag        = Int(id)
+                item.state      = (supported && id == selected) ? .on : .off
+                item.isEnabled  = supported
                 menu.addItem(item)
             }
         }
@@ -263,16 +270,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Hilfsmethoden
 
-    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen und kein DisplayLink.
-    // Fällt auf das erste verfügbare nicht-DisplayLink-Display zurück.
+    // Gibt die gespeicherte Display-ID zurück, falls noch angeschlossen und steuerbar.
+    // Fällt auf das erste steuerbare externe Display zurück.
     private func resolvedSelectedID() -> CGDirectDisplayID? {
-        let externals = DisplayManager.shared.externalDisplayIDs()
-        guard !externals.isEmpty else { return nil }
+        let supported = DisplayManager.shared.externalDisplayIDs()
+            .filter { DisplayManager.shared.isSupported($0) }
+        guard !supported.isEmpty else { return nil }
 
         let stored = CGDirectDisplayID(UInt32(UserDefaults.standard.integer(forKey: kSelectedDisplayKey)))
-        if stored != 0, externals.contains(stored) { return stored }
+        if stored != 0, supported.contains(stored) { return stored }
 
-        let first = externals[0]
+        let first = supported[0]
         UserDefaults.standard.set(Int(first), forKey: kSelectedDisplayKey)
         return first
     }

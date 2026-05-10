@@ -12,15 +12,18 @@ final class DisplayManager {
         refreshNameCache()
     }
 
-    // Nur externe Displays, die via CGConfigureDisplayMirrorOfDisplay steuerbar sind.
-    // Gefiltert werden: DisplayLink-USB-Adapter und USB-C/Thunderbolt-Monitore.
+    // Alle externen Displays (builtin ausgenommen).
     func externalDisplayIDs() -> [CGDirectDisplayID] {
         var ids = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
         CGGetOnlineDisplayList(16, &ids, &count)
-        return Array(ids[0..<Int(count)]).filter {
-            CGDisplayIsBuiltin($0) == 0 && isSupportedDisplay($0)
-        }
+        return Array(ids[0..<Int(count)]).filter { CGDisplayIsBuiltin($0) == 0 }
+    }
+
+    // True = Display ist via CGConfigureDisplayMirrorOfDisplay steuerbar.
+    // False für DisplayLink-Adapter (0x17E9) und USB-C/Thunderbolt-Displays.
+    func isSupported(_ id: CGDirectDisplayID) -> Bool {
+        isSupportedDisplay(id)
     }
 
     // True = Display ist aktiv (nicht gespiegelt)
