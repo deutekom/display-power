@@ -262,10 +262,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let isOn = DisplayManager.shared.isEnabled(id)
-        button.image = NSImage(systemSymbolName: symbol,
-                               accessibilityDescription: isOn ? L("display_on") : L("display_off"))
-        button.image?.isTemplate = true
-        button.contentTintColor  = isOn ? nil : .tertiaryLabelColor
+        if isOn {
+            button.image = NSImage(systemSymbolName: symbol,
+                                   accessibilityDescription: L("display_on"))
+            button.image?.isTemplate = true
+            button.contentTintColor  = nil
+        } else {
+            let slashSymbol = symbol + ".slash"
+            if let slashImage = NSImage(systemSymbolName: slashSymbol,
+                                        accessibilityDescription: L("display_off")) {
+                button.image         = slashImage
+                button.image?.isTemplate = true
+                button.contentTintColor  = nil
+            } else {
+                button.image = NSImage(systemSymbolName: symbol,
+                                       accessibilityDescription: L("display_off"))
+                button.image?.isTemplate = true
+                button.contentTintColor  = .tertiaryLabelColor
+            }
+        }
     }
 
     // MARK: - Autostart
