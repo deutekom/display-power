@@ -99,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Menü
 
     private func showMenu(from button: NSStatusBarButton) {
+        DisplayManager.shared.refreshNameCache()
         let menu = NSMenu()
         menu.autoenablesItems = false
 
@@ -114,20 +115,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let isMenuClickMode = UserDefaults.standard.bool(forKey: kMenuClickModeKey)
 
             for id in externals {
-                let reason    = DisplayManager.shared.unsupportedReason(id)
-                let supported = reason == nil
-                let isOn      = supported && DisplayManager.shared.isEnabled(id)
-                var title     = DisplayManager.shared.displayName(id)
+                let reason       = DisplayManager.shared.unsupportedReason(id)
+                let supported    = reason == nil
+                let isMain       = id == CGMainDisplayID()
+                let canToggleOff = !isMain || DisplayManager.shared.hasAlternativeForMain()
+                let isOn         = supported && DisplayManager.shared.isEnabled(id)
+
+                // In menu-click-Modus: Hauptmonitor ohne Alternative ist nicht schaltbar
+                let isActionable: Bool
+                if isMenuClickMode {
+                    isActionable = supported && (!isOn || canToggleOff)
+                } else {
+                    isActionable = supported
+                }
+
+                var title = DisplayManager.shared.displayName(id)
                 if let r = reason {
                     switch r {
                     case .usbc:        title += L("usbc_suffix")
                     case .displayPort: title += L("displayport_suffix")
                     }
+                } else if isMain && isOn {
+                    title += L("primary_suffix")
                 } else if !isMenuClickMode && !isOn {
                     title += L("display_off_suffix")
                 }
 
-                let action: Selector? = supported
+                let action: Selector? = isActionable
                     ? (isMenuClickMode ? #selector(toggleDisplay(_:)) : #selector(selectDisplay(_:)))
                     : nil
                 let item = NSMenuItem(
@@ -135,9 +149,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     action:        action,
                     keyEquivalent: ""
                 )
-                item.target    = supported ? self : nil
+                item.target    = isActionable ? self : nil
                 item.tag       = Int(id)
-                item.isEnabled = supported
+                item.isEnabled = isActionable
 
                 if isMenuClickMode {
                     item.state = isOn ? .on : .off

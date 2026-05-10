@@ -7,6 +7,7 @@ final class DisplayManager {
     static let shared = DisplayManager()
 
     private var nameCache: [CGDirectDisplayID: String] = [:]
+    private static let kPreviousMainKey = "previousMainDisplayID"
 
     private init() {
         refreshNameCache()
@@ -26,10 +27,15 @@ final class DisplayManager {
     }
 
     // Display "ausschalten": als Spiegel des Hauptdisplays konfigurieren.
-    // Fenster wandern automatisch auf andere Displays.
+    // Wenn id der Hauptmonitor ist, wird zuerst ein anderer Display zum Hauptmonitor befördert.
     func disable(_ id: CGDirectDisplayID) {
+        if id == CGMainDisplayID() {
+            guard promoteAlternativeToMain(excluding: id) else { return }
+            if UserDefaults.standard.object(forKey: Self.kPreviousMainKey) == nil {
+                UserDefaults.standard.set(Int(id), forKey: Self.kPreviousMainKey)
+            }
+        }
         let main = CGMainDisplayID()
-        guard id != main else { return }
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
         CGConfigureDisplayMirrorOfDisplay(config, id, main)
@@ -37,11 +43,23 @@ final class DisplayManager {
     }
 
     // Display "einschalten": Spiegelung aufheben.
+    // War dieses Display vorher der Hauptmonitor, wird es nach 500 ms wiederhergestellt.
     func enable(_ id: CGDirectDisplayID) {
         var config: CGDisplayConfigRef?
         guard CGBeginDisplayConfiguration(&config) == .success, let config else { return }
         CGConfigureDisplayMirrorOfDisplay(config, id, kCGNullDirectDisplay)
         CGCompleteDisplayConfiguration(config, .forSession)
+
+        guard UserDefaults.standard.object(forKey: Self.kPreviousMainKey) != nil else { return }
+        let stored = CGDirectDisplayID(UInt32(
+            UserDefaults.standard.integer(forKey: Self.kPreviousMainKey)
+        ))
+        guard stored == id else { return }
+        UserDefaults.standard.removeObject(forKey: Self.kPreviousMainKey)
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            promoteToMain(id)
+        }
     }
 
     func toggle(_ id: CGDirectDisplayID) {
@@ -79,6 +97,50 @@ final class DisplayManager {
 
     func isSupported(_ id: CGDirectDisplayID) -> Bool {
         unsupportedReason(id) == nil
+    }
+
+    // True wenn es außer dem aktuellen Hauptmonitor noch mindestens ein aktives Display gibt
+    func hasAlternativeForMain() -> Bool {
+        let main = CGMainDisplayID()
+        var ids = [CGDirectDisplayID](repeating: 0, count: 16)
+        var count: UInt32 = 0
+        CGGetActiveDisplayList(16, &ids, &count)
+        return ids[0..<Int(count)].contains { $0 != main }
+    }
+
+    // Verschiebt alle aktiven Displays so, dass newMainID bei (0,0) landet → wird Hauptmonitor.
+    // Relative Abstände zwischen allen Displays bleiben erhalten.
+    @discardableResult
+    func promoteToMain(_ newMainID: CGDirectDisplayID) -> Bool {
+        guard newMainID != CGMainDisplayID() else { return true }
+        let target = CGDisplayBounds(newMainID)
+        let dxF = -target.origin.x
+        let dyF = -target.origin.y
+
+        var ids = [CGDirectDisplayID](repeating: 0, count: 16)
+        var count: UInt32 = 0
+        CGGetActiveDisplayList(16, &ids, &count)
+
+        var config: CGDisplayConfigRef?
+        guard CGBeginDisplayConfiguration(&config) == .success, let config else { return false }
+        for id in ids[0..<Int(count)] {
+            let b = CGDisplayBounds(id)
+            CGConfigureDisplayOrigin(config, id,
+                Int32((b.origin.x + dxF).rounded()),
+                Int32((b.origin.y + dyF).rounded()))
+        }
+        return CGCompleteDisplayConfiguration(config, .forSession) == .success
+    }
+
+    // Sucht einen anderen aktiven Display (außer excluded) und macht ihn zum Hauptmonitor.
+    private func promoteAlternativeToMain(excluding excluded: CGDirectDisplayID) -> Bool {
+        var ids = [CGDirectDisplayID](repeating: 0, count: 16)
+        var count: UInt32 = 0
+        CGGetActiveDisplayList(16, &ids, &count)
+        guard let candidate = ids[0..<Int(count)].first(where: { $0 != excluded }) else {
+            return false
+        }
+        return promoteToMain(candidate)
     }
 
     // macOS 16+: Sucht in AppleATCDPAltModePort nach einem Display anhand

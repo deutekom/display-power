@@ -35,3 +35,4 @@
 
 "usbc_suffix" = " (USB-C)";
 "displayport_suffix" = " (DisplayPort)";
+"primary_suffix" = " (Primær)";
