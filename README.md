@@ -2,6 +2,8 @@
 
 Lightweight macOS menu bar app that hides external HDMI monitors from macOS with a single click.
 
+[Deutsche Version weiter unten](#deutsch)
+
 ![Screenshot](docs/screenshot.png)
 
 ## The Problem
